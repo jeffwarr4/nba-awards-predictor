@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual env
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / tools
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.key
+*.pem
+
+# Data (keep raw/processed out of git by default)
+data/raw/
+data/processed/
+
+# Outputs (optional: keep generated artifacts out of git)
+outputs/canva/
+outputs/web/
+
+# Logs
+*.log
