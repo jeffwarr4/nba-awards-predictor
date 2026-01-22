@@ -9,6 +9,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 CURRENT_PATH = REPO_ROOT / "data" / "processed" / "current" / "nba_mvp_current_candidates.csv"
 OUT_DIR = REPO_ROOT / "data" / "processed" / "outputs"
+PRIOR_TOP10_PATH = OUT_DIR / "web_prior_top10.csv"
+
 
 def zscore(s: pd.Series) -> pd.Series:
     s = pd.to_numeric(s, errors="coerce")
@@ -85,11 +87,40 @@ def main() -> None:
 
     # Web outputs
     web_current_top10 = df.head(10).copy()
-    web_current_top10 = web_current_top10.assign(
-        rank=web_current_top10["mvp_rank"].astype(int),
-        rank_delta=np.nan,
-        mover_label="NEW"  # Step 8 initializes; Step 8.3 will compute deltas if prior exists
-    )
+    web_current_top10["rank"] = web_current_top10["mvp_rank"].astype(int)
+
+    # Default movers (first run or missing prior)
+    web_current_top10["rank_delta"] = np.nan
+    web_current_top10["mover_label"] = "NEW"
+
+    # Compute movers only if prior snapshot exists
+    if PRIOR_TOP10_PATH.exists():
+        prior_df = pd.read_csv(PRIOR_TOP10_PATH)
+
+        # Build lookup of prior rank by player_key
+        prior_map = (
+            prior_df[["player_key", "rank"]]
+            .dropna()
+            .set_index("player_key")["rank"]
+            .to_dict()
+        )
+
+    def mover(row):
+        prev_rank = prior_map.get(row["player_key"])
+        if prev_rank is None:
+            return np.nan, "NEW"
+
+        delta = int(prev_rank) - int(row["rank"])
+        if delta > 0:
+            return delta, f"↑{delta}"
+        if delta < 0:
+            return delta, f"↓{abs(delta)}"
+        return 0, "—"
+
+        movers = web_current_top10.apply(lambda r: pd.Series(mover(r)), axis=1)
+        web_current_top10[["rank_delta", "mover_label"]] = movers
+
+
 
     # Meta
     season = str(df["season"].iloc[0])
@@ -122,6 +153,13 @@ def main() -> None:
         "last_updated_utc"
     ]
     web_current_top10[cols_top10].to_csv(out_top10, index=False)
+
+    # Save snapshot for next run
+    web_current_top10[["player_key", "rank"]].to_csv(
+    PRIOR_TOP10_PATH, index=False
+    )
+    print(f"[SAVED] {PRIOR_TOP10_PATH}")
+
 
     # Save meta
     out_meta = OUT_DIR / "web_meta.csv"
