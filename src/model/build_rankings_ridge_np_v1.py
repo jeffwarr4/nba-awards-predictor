@@ -92,9 +92,9 @@ def main() -> None:
     z_seed = zscore(-pd.to_numeric(merged["team_conf_rank"], errors="coerce"))
 
     merged["mvp_score"] = (
-        0.80 * minmax01(merged["ridge_pred_vote_share"]) +
-        0.15 * minmax01(z_win) +
-        0.05 * minmax01(z_seed)
+        0.70 * minmax01(merged["ridge_pred_vote_share"]) +
+        0.20 * minmax01(z_win) +
+        0.10 * minmax01(z_seed)
     )
 
     merged = merged.sort_values("mvp_score", ascending=False).reset_index(drop=True)
