@@ -1,0 +1,60 @@
+name: NBA MVP Weekly Refresh (Publish to Pages)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Mondays 17:15 UTC (~9:15am Pacific in standard time)
+    - cron: "15 17 * * 1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nba-mvp-weekly-pages
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run NBA MVP pipeline
+        run: |
+          python -m src.data.build_current_candidates
+          python -m src.data.build_team_standings
+          python -m src.model.build_rankings_ridge_np_v1
+
+      - name: Publish outputs to GitHub Pages folder (docs/)
+        run: |
+          python -m src.publish.publish_pages
+
+      - name: Commit published artifacts (docs/) if changed
+        run: |
+          git config user.name "nba-mvp-bot"
+          git config user.email "nba-mvp-bot@users.noreply.github.com"
+
+          git add docs/nba/mvp/*.csv
+
+          if git diff --cached --quiet; then
+            echo "No published changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Publish NBA MVP outputs (Pages)"
+          git push
