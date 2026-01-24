@@ -5,6 +5,9 @@ from datetime import datetime, timezone
 import re
 import unicodedata
 import pandas as pd
+import time
+import random
+from requests.exceptions import ReadTimeout, ConnectionError
 
 from nba_api.stats.endpoints import leaguedashplayerstats
 from nba_api.stats.library.parameters import SeasonTypeAllStar
@@ -37,13 +40,31 @@ def main(season_end_year: int = 2026) -> None:
     season = season_label_from_end_year(season_end_year)
 
     # nba_api can be rate-sensitive; keep it to one endpoint call here
-    endpoint = leaguedashplayerstats.LeagueDashPlayerStats(
-        season=season,
-        season_type_all_star=SeasonTypeAllStar.regular,
-        per_mode_detailed="PerGame",
-        timeout=60
-    )
-    df = endpoint.get_data_frames()[0].copy()
+    max_tries = 5
+    base_sleep = 6
+
+    last_err = None
+    for attempt in range(1, max_tries + 1):
+        try:
+            endpoint = leaguedashplayerstats.LeagueDashPlayerStats(
+                season=season,
+                season_type_all_star=SeasonTypeAllStar.regular,
+                per_mode_detailed="PerGame",
+                timeout=120,  # bump timeout
+            )
+            df = endpoint.get_data_frames()[0].copy()
+            last_err = None
+            break
+        except (ReadTimeout, ConnectionError, TimeoutError) as e:
+            last_err = e
+            sleep_s = base_sleep * (2 ** (attempt - 1)) + random.uniform(0, 2)
+            print(f"[WARN] stats.nba.com request failed (attempt {attempt}/{max_tries}): {e}")
+            print(f"[WARN] sleeping {sleep_s:.1f}s then retrying...")
+            time.sleep(sleep_s)
+
+    if last_err is not None:
+        raise RuntimeError(f"Failed to fetch LeagueDashPlayerStats after {max_tries} attempts") from last_err
+
 
     # Standardize key fields (nba_api uses different names than your training set)
     # Common columns available: PLAYER_NAME, TEAM_ABBREVIATION, GP, MIN, PTS, REB, AST, STL, BLK, FG_PCT, FG3_PCT, FT_PCT
