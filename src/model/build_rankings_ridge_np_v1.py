@@ -156,14 +156,15 @@ def main() -> None:
 
     out_top10 = OUT_DIR / "web_current_top10.csv"
     cols_top10 = [
-        "season", "season_end_year",
-        "rank", "player_key", "player_name", "team",
-        "mvp_score", "ridge_pred_vote_share",
-        "team_win_pct", "team_conf_rank", "team_conference",
-        "pts", "trb", "ast", "games_played",
-        "rank_delta", "mover_label",
-        "last_updated_utc"
-    ]
+    "season", "season_end_year",
+    "rank", "player_key", "player_name", "team",
+    "mvp_score", "ridge_pred_vote_share",
+    "team_win_pct", "team_conf_rank", "team_conference",
+    "pts", "trb", "ast", "stl", "blk", "games_played",
+    "rank_delta", "mover_label",
+    "last_updated_utc"
+]
+
     web_current_top10[cols_top10].to_csv(out_top10, index=False, encoding="utf-8-sig")
 
     out_meta = OUT_DIR / "web_meta.csv"
