@@ -152,7 +152,7 @@ def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     out_all = OUT_DIR / "model_all_candidates.csv"
-    merged.to_csv(out_all, index=False)
+    merged.to_csv(out_all, index=False, encoding="utf-8-sig")
 
     out_top10 = OUT_DIR / "web_current_top10.csv"
     cols_top10 = [
@@ -164,13 +164,13 @@ def main() -> None:
         "rank_delta", "mover_label",
         "last_updated_utc"
     ]
-    web_current_top10[cols_top10].to_csv(out_top10, index=False)
+    web_current_top10[cols_top10].to_csv(out_top10, index=False, encoding="utf-8-sig")
 
     out_meta = OUT_DIR / "web_meta.csv"
-    web_meta.to_csv(out_meta, index=False)
+    web_meta.to_csv(out_meta, index=False, encoding="utf-8-sig")
 
     # Snapshot for next run
-    web_current_top10[["player_key", "rank"]].to_csv(PRIOR_TOP10_PATH, index=False)
+    web_current_top10[["player_key", "rank"]].to_csv(PRIOR_TOP10_PATH, index=False, encoding="utf-8-sig")
 
     print(f"[SAVED] {out_all}")
     print(f"[SAVED] {out_top10}")
