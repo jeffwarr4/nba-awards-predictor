@@ -43,10 +43,10 @@ jobs:
       # Instead, require that a cached/current candidates CSV exists in the repo.
       - name: Verify current candidates file exists (freshness gate)
         run: |
-          ls -la data/processed/current_candidates_2026.csv
+          ls -la data/processed/current/nba_mvp_current_candidates.csv
           python - << 'PY'
           import os, datetime
-          p="data/processed/current_candidates_2026.csv"
+          p="data/processed/current/nba_mvp_current_candidates.csv"
           mtime=datetime.datetime.fromtimestamp(os.path.getmtime(p), tz=datetime.timezone.utc)
           age=(datetime.datetime.now(datetime.timezone.utc)-mtime).total_seconds()/3600
           print(f"[INFO] current_candidates_2026.csv age_hours={age:.1f}")
