@@ -7,7 +7,9 @@ on:
     - cron: "15 17 * * 1"
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: nba-mvp-weekly-pages
@@ -16,6 +18,9 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repo
@@ -34,27 +39,39 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run NBA MVP pipeline
+      # IMPORTANT: Do NOT call stats.nba.com here
+      # Instead, require that a cached/current candidates CSV exists in the repo.
+      - name: Verify current candidates file exists (freshness gate)
         run: |
-          python -m src.data.build_current_candidates
+          ls -la data/processed/current_candidates_2026.csv
+          python - << 'PY'
+          import os, datetime
+          p="data/processed/current_candidates_2026.csv"
+          mtime=datetime.datetime.fromtimestamp(os.path.getmtime(p), tz=datetime.timezone.utc)
+          age=(datetime.datetime.now(datetime.timezone.utc)-mtime).total_seconds()/3600
+          print(f"[INFO] current_candidates_2026.csv age_hours={age:.1f}")
+          # allow up to 10 days before failing (tune as you like)
+          if age > 24*10:
+              raise SystemExit("current_candidates_2026.csv is too old. Refresh locally and push.")
+          PY
+
+      - name: Run NBA MVP pipeline (from cached candidates)
+        run: |
           python -m src.data.build_team_standings
           python -m src.model.build_rankings_ridge_np_v1
 
-      - name: Publish outputs to GitHub Pages folder (docs/)
+      - name: Publish outputs into docs/
         run: |
           python -m src.publish.publish_pages
 
-      - name: Commit published artifacts (docs/) if changed
-        run: |
-          git config user.name "nba-mvp-bot"
-          git config user.email "nba-mvp-bot@users.noreply.github.com"
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
-          git add docs/nba/mvp/*.csv
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
 
-          if git diff --cached --quiet; then
-            echo "No published changes to commit."
-            exit 0
-          fi
-
-          git commit -m "Publish NBA MVP outputs (Pages)"
-          git push
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
