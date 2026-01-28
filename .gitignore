@@ -25,10 +25,16 @@ Thumbs.db
 
 # Data (keep raw/processed out of git by default)
 data/raw/
-data/processed/
 
-# Allow committed current candidates files
+# Ignore everything in processed by default
+data/processed/*
+
+# But allow the folder itself
+!data/processed/current
+
+# And allow the candidates file(s)
 !data/processed/current/nba_mvp_current_candidates.csv
+
 
 # Outputs (optional: keep generated artifacts out of git)
 outputs/canva/
