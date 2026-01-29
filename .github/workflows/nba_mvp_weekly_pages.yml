@@ -41,20 +41,6 @@ jobs:
 
       # IMPORTANT: Do NOT call stats.nba.com here
       # Instead, require that a cached/current candidates CSV exists in the repo.
-      - name: Verify current candidates file exists (freshness gate)
-        run: |
-          ls -la data/processed/current/nba_mvp_current_candidates.csv
-          python - << 'PY'
-          import os, datetime
-          p="data/processed/current/nba_mvp_current_candidates.csv"
-          mtime=datetime.datetime.fromtimestamp(os.path.getmtime(p), tz=datetime.timezone.utc)
-          age=(datetime.datetime.now(datetime.timezone.utc)-mtime).total_seconds()/3600
-          print(f"[INFO] nba_mvp_current_candidates age_hours={age:.1f}")
-          # allow up to 10 days before failing (tune as you like)
-          if age > 24*10:
-              raise SystemExit("nba_mvp_current_candidates is too old. Refresh locally and push.")
-          PY
-
       - name: Verify cached input files exist (freshness gate)
         run: |
           ls -la data/processed/current/nba_mvp_current_candidates.csv
@@ -77,6 +63,7 @@ jobs:
       - name: Run NBA MVP pipeline (from cached inputs)
         run: |
           python -m src.model.build_rankings_ridge_np_v1
+          python -m src.publish.build_canva_flat_nba
 
 
       - name: Publish outputs into docs/
