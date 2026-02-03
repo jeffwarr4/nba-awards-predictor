@@ -65,10 +65,17 @@ jobs:
           python -m src.model.build_rankings_ridge_np_v1
           python -m src.publish.build_canva_flat_nba
 
+      - name: Verify outputs exist before publish_pages
+        run: |
+          ls -la data/processed/outputs
+          test -f data/processed/outputs/canva_top5_flat.csv || (echo "MISSING canva_top5_flat.csv" && exit 1)
+          test -f data/processed/outputs/canva_6_10_flat.csv || (echo "MISSING canva_6_10_flat.csv" && exit 1)
 
       - name: Publish outputs into docs/
         run: |
           python -m src.publish.publish_pages
+          ls -la docs/nba/mvp
+
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

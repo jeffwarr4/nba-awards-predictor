@@ -13,7 +13,8 @@ FILES = [
     "web_current_top10.csv",
     "web_prior_top10.csv",
     "web_meta.csv",
-    "canva_top5_flat.csv"
+    "canva_top5_flat.csv",
+    "canva_6_10_flat.csv"
 ]
 
 def main() -> None:
