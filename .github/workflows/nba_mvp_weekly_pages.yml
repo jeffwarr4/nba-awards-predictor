@@ -69,6 +69,20 @@ jobs:
           check("data/processed/current/nba_team_standings.csv")
           PY
 
+      - name: Create prior Top10 for movers (seed -> Pages fallback)
+        run: |
+          mkdir -p data/processed/outputs
+          if [ -f data/processed/outputs/seed_web_prior_top10.csv ]; then
+            echo "[INFO] Using seed prior snapshot"
+            cp data/processed/outputs/seed_web_prior_top10.csv data/processed/outputs/web_prior_top10.csv
+          else
+            echo "[INFO] Fetching prior from Pages"
+            curl -L --fail \
+              -o data/processed/outputs/web_prior_top10.csv \
+              https://jeffwarr4.github.io/nba-awards-predictor/nba/mvp/web_current_top10.csv \
+              || echo "[WARN] No prior found yet"
+          fi
+    
       - name: Run NBA MVP pipeline (from cached inputs)
         run: |
           python -m src.model.build_rankings_ridge_np_v1
