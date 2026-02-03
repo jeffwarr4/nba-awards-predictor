@@ -38,6 +38,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+                
+      - name: Fetch prior top10 from GitHub Pages (last published current)
+        run: |
+          mkdir -p data/processed/prior
+          echo "[INFO] Downloading last published web_current_top10.csv as prior..."
+          curl -L --fail -o data/processed/prior/web_prior_top10.csv \
+            https://jeffwarr4.github.io/nba-awards-predictor/nba/mvp/web_current_top10.csv \
+            || echo "[WARN] No prior found on Pages yet (first run)."
+
 
       # IMPORTANT: Do NOT call stats.nba.com here
       # Instead, require that a cached/current candidates CSV exists in the repo.
