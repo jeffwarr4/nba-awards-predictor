@@ -31,10 +31,12 @@ data/processed/*
 
 # But allow the folder itself
 !data/processed/current
+!data/processed/outputs
 
 # And allow the candidates file(s)
 !data/processed/current/nba_mvp_current_candidates.csv
 !data/processed/current/nba_team_standings.csv
+!data/processed/outputs/web_prior_top10.csv
 
 
 # Outputs (optional: keep generated artifacts out of git)
