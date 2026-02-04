@@ -70,7 +70,8 @@ jobs:
       # 1) Try Pages last published current -> prior
       # 2) Else seed file in repo -> prior (one-time bootstrap)
       # 3) Else fail loudly (no silent movers break)
-      - name: Prepare web_prior_top10.csv (Pages -> seed -> fail)
+      - name: Prepare web_prior_top10.csv (seed opt-in -> Pages -> fail)
+        shell: bash
         run: |
           set -euo pipefail
           mkdir -p data/processed/outputs
@@ -79,6 +80,18 @@ jobs:
           PAGES_URL="https://jeffwarr4.github.io/nba-awards-predictor/nba/mvp/web_current_top10.csv"
           SEED_IN="data/processed/seeds/mvp_prior_top10_seed.csv"
 
+          USE_SEED="${{ github.event.inputs.use_seed_prior }}"
+          echo "[INFO] use_seed_prior=${USE_SEED:-<empty>}"
+
+          if [ "${USE_SEED:-false}" = "true" ]; then
+          if [ -f "$SEED_IN" ]; then
+            echo "[INFO] Forcing seed prior snapshot: $SEED_IN"
+            cp "$SEED_IN" "$PRIOR_OUT"
+          else
+            echo "[ERROR] use_seed_prior=true but seed file missing: $SEED_IN"
+            exit 1
+          fi
+          else
           echo "[INFO] Trying to download prior from Pages (last published current)..."
           if curl -L --fail --silent --show-error -o "$PRIOR_OUT" "$PAGES_URL"; then
             echo "[INFO] Prior loaded from Pages: $PAGES_URL"
@@ -87,12 +100,13 @@ jobs:
             cp "$SEED_IN" "$PRIOR_OUT"
           else
             echo "[ERROR] No prior available (Pages missing AND seed missing)."
-            echo "[ERROR] Create $SEED_IN (one-time seed) or publish once successfully so Pages has web_current_top10.csv."
             exit 1
+          fi
           fi
 
           echo "[INFO] Prior preview:"
-          head -n 5 "$PRIOR_OUT"
+          head -n 12 "$PRIOR_OUT"
+
 
       - name: Run NBA MVP pipeline (from cached inputs)
         env:
