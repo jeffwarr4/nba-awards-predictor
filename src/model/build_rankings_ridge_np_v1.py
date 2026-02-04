@@ -13,10 +13,10 @@ CURRENT_PATH = REPO_ROOT / "data" / "processed" / "current" / "nba_mvp_current_c
 STANDINGS_PATH = REPO_ROOT / "data" / "processed" / "current" / "nba_team_standings.csv"
 OUT_DIR = REPO_ROOT / "data" / "processed" / "outputs"
 
-# Allow workflow/env to override the prior path (default keeps existing behavior of looking in outputs)
-PRIOR_TOP10_PATH = Path(
-    os.getenv("MVP_PRIOR_TOP10_PATH", str(OUT_DIR / "web_prior_top10.csv"))
-)
+# Allow workflow/env to override the prior path (relative paths resolve from repo root)
+_env_prior = Path(os.getenv("MVP_PRIOR_TOP10_PATH", str(OUT_DIR / "web_prior_top10.csv")))
+PRIOR_TOP10_PATH = _env_prior if _env_prior.is_absolute() else (REPO_ROOT / _env_prior)
+
 
 # If 1, missing prior is a hard error. If 0, movers are skipped (rank_delta stays NaN, mover_label stays NEW)
 FAIL_ON_MISSING_PRIOR = os.getenv("FAIL_ON_MISSING_PRIOR", "1") == "1"
@@ -139,7 +139,9 @@ def main() -> None:
             raise FileNotFoundError(msg + " (Set FAIL_ON_MISSING_PRIOR=0 to skip movers.)")
         print(msg + " Proceeding without movers.")
     else:
-        prior_df = pd.read_csv(PRIOR_TOP10_PATH)
+        prior_df = pd.read_csv(PRIOR_TOP10_PATH, encoding="utf-8-sig")
+        prior_df.columns = [c.strip().lstrip("\ufeff") for c in prior_df.columns]
+
 
         required = {"player_key", "rank"}
         missing = required - set(prior_df.columns)
@@ -152,6 +154,12 @@ def main() -> None:
             .set_index("player_key")["rank"]
             .to_dict()
         )
+
+        print(f"[INFO] Using PRIOR_TOP10_PATH={PRIOR_TOP10_PATH}")
+        print("[INFO] Prior ranks for key players:")
+        for k in ["donovan_mitchell", "jalen_duren", "tyrese_maxey"]:
+            print(f"  {k}: {prior_map.get(k)}")
+
 
         def mover(row):
             prev_rank = prior_map.get(row["player_key"])

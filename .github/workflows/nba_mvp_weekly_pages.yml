@@ -117,6 +117,12 @@ jobs:
           set -euo pipefail
           python -m src.model.build_rankings_ridge_np_v1
           python -m src.publish.build_canva_flat_nba
+      
+      - name: Debug outputs after model
+        run: |
+          echo "=== outputs/web_current_top10.csv ==="
+          head -n 15 data/processed/outputs/web_current_top10.csv
+
 
       - name: Verify outputs exist before publish_pages
         run: |
@@ -130,6 +136,12 @@ jobs:
           set -euo pipefail
           python -m src.publish.publish_pages
           ls -la docs/nba/mvp
+
+      - name: Debug docs after publish_pages
+        run: |
+          echo "=== docs/nba/mvp/web_current_top10.csv ==="
+          head -n 15 docs/nba/mvp/web_current_top10.csv
+
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
