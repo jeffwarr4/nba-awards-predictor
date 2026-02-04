@@ -38,20 +38,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-                
-      - name: Fetch prior top10 from GitHub Pages (last published current)
-        run: |
-          mkdir -p data/processed/prior
-          echo "[INFO] Downloading last published web_current_top10.csv as prior..."
-          curl -L --fail -o data/processed/prior/web_prior_top10.csv \
-            https://jeffwarr4.github.io/nba-awards-predictor/nba/mvp/web_current_top10.csv \
-            || echo "[WARN] No prior found on Pages yet (first run)."
-
 
       # IMPORTANT: Do NOT call stats.nba.com here
       # Instead, require that a cached/current candidates CSV exists in the repo.
       - name: Verify cached input files exist (freshness gate)
         run: |
+          set -euo pipefail
           ls -la data/processed/current/nba_mvp_current_candidates.csv
           ls -la data/processed/current/nba_team_standings.csv
 
@@ -69,36 +61,56 @@ jobs:
           check("data/processed/current/nba_team_standings.csv")
           PY
 
-      - name: Create prior Top10 for movers (seed -> Pages fallback)
+      # Single deterministic "prior" step:
+      # 1) Try Pages last published current -> prior
+      # 2) Else seed file in repo -> prior (one-time bootstrap)
+      # 3) Else fail loudly (no silent movers break)
+      - name: Prepare web_prior_top10.csv (Pages -> seed -> fail)
         run: |
+          set -euo pipefail
           mkdir -p data/processed/outputs
-          if [ -f data/processed/outputs/seed_web_prior_top10.csv ]; then
-            echo "[INFO] Using seed prior snapshot"
-            cp data/processed/outputs/seed_web_prior_top10.csv data/processed/outputs/web_prior_top10.csv
+
+          PRIOR_OUT="data/processed/outputs/web_prior_top10.csv"
+          PAGES_URL="https://jeffwarr4.github.io/nba-awards-predictor/nba/mvp/web_current_top10.csv"
+          SEED_IN="data/processed/seeds/mvp_prior_top10_seed.csv"
+
+          echo "[INFO] Trying to download prior from Pages (last published current)..."
+          if curl -L --fail --silent --show-error -o "$PRIOR_OUT" "$PAGES_URL"; then
+            echo "[INFO] Prior loaded from Pages: $PAGES_URL"
+          elif [ -f "$SEED_IN" ]; then
+            echo "[WARN] Pages prior not found. Using seed file: $SEED_IN"
+            cp "$SEED_IN" "$PRIOR_OUT"
           else
-            echo "[INFO] Fetching prior from Pages"
-            curl -L --fail \
-              -o data/processed/outputs/web_prior_top10.csv \
-              https://jeffwarr4.github.io/nba-awards-predictor/nba/mvp/web_current_top10.csv \
-              || echo "[WARN] No prior found yet"
+            echo "[ERROR] No prior available (Pages missing AND seed missing)."
+            echo "[ERROR] Create $SEED_IN (one-time seed) or publish once successfully so Pages has web_current_top10.csv."
+            exit 1
           fi
-    
+
+          echo "[INFO] Prior preview:"
+          head -n 5 "$PRIOR_OUT"
+
       - name: Run NBA MVP pipeline (from cached inputs)
+        env:
+          MVP_PRIOR_TOP10_PATH: data/processed/outputs/web_prior_top10.csv
+          FAIL_ON_MISSING_PRIOR: "1"
+          WRITE_LOCAL_PRIOR_SNAPSHOT: "0"
         run: |
+          set -euo pipefail
           python -m src.model.build_rankings_ridge_np_v1
           python -m src.publish.build_canva_flat_nba
 
       - name: Verify outputs exist before publish_pages
         run: |
+          set -euo pipefail
           ls -la data/processed/outputs
           test -f data/processed/outputs/canva_top5_flat.csv || (echo "MISSING canva_top5_flat.csv" && exit 1)
           test -f data/processed/outputs/canva_6_10_flat.csv || (echo "MISSING canva_6_10_flat.csv" && exit 1)
 
       - name: Publish outputs into docs/
         run: |
+          set -euo pipefail
           python -m src.publish.publish_pages
           ls -la docs/nba/mvp
-
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -111,5 +123,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
- 
