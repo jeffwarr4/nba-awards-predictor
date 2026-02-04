@@ -2,6 +2,11 @@ name: NBA MVP Weekly Refresh (Publish to Pages)
 
 on:
   workflow_dispatch:
+    inputs:
+      use_seed_prior:
+        description: "Force use of seed prior snapshot for this run (bootstrap Movers)"
+        required: false
+        default: "false"
   schedule:
     # Mondays 17:15 UTC (~9:15am Pacific in standard time)
     - cron: "15 17 * * 1"
