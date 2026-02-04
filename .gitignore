@@ -33,6 +33,10 @@ data/processed/*
 !data/processed/current
 !data/processed/outputs
 
+# Allow seed snapshots (one-time committed files)
+!data/processed/seeds/
+!data/processed/seeds/**
+
 # And allow the candidates file(s)
 !data/processed/current/nba_mvp_current_candidates.csv
 !data/processed/current/nba_team_standings.csv
