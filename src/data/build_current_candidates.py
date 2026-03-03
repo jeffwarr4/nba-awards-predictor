@@ -7,10 +7,13 @@ import unicodedata
 import pandas as pd
 import time
 import random
-from requests.exceptions import ReadTimeout, ConnectionError
+
+from requests import Session
+from requests.exceptions import ReadTimeout, ConnectionError, Timeout
 
 from nba_api.stats.endpoints import leaguedashplayerstats
 from nba_api.stats.library.parameters import SeasonTypeAllStar
+from nba_api.stats.library.http import NBAStatsHTTP
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = REPO_ROOT / "data" / "processed" / "current"
@@ -32,6 +35,28 @@ def season_label_from_end_year(end_year: int) -> str:
     return f"{end_year-1}-{str(end_year)[-2:]}"
 
 
+def make_session() -> Session:
+    """
+    Create a browser-like session for stats.nba.com.
+    This is the #1 fix for hanging/timeouts.
+    """
+    s = Session()
+    s.headers.update({
+        # Browser-ish UA; stats.nba.com is picky
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/122.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.nba.com/",
+        "Origin": "https://www.nba.com",
+        "Connection": "keep-alive",
+    })
+    return s
+
+
 def main(season_end_year: int = 2026) -> None:
     """
     Pull current-season per-game boxscore + shooting % from nba_api.
@@ -39,35 +64,43 @@ def main(season_end_year: int = 2026) -> None:
     """
     season = season_label_from_end_year(season_end_year)
 
-    # nba_api can be rate-sensitive; keep it to one endpoint call here
-    max_tries = 5
-    base_sleep = 6
+    # Attach our hardened session to nba_api's HTTP layer
+    # nba_api uses NBAStatsHTTP internally; we can override its session
+    NBAStatsHTTP._session = make_session()
+
+    max_tries = 6
+    base_sleep = 4
+
+    # Use shorter timeouts per attempt; retries are better than one giant hang.
+    # nba_api passes this "timeout" to requests. If a tuple is supported in your version,
+    # you can switch to (connect, read). If not, it will use this as total seconds.
+    timeout_seconds = 45
 
     last_err = None
+    df = None
+
     for attempt in range(1, max_tries + 1):
         try:
             endpoint = leaguedashplayerstats.LeagueDashPlayerStats(
                 season=season,
                 season_type_all_star=SeasonTypeAllStar.regular,
                 per_mode_detailed="PerGame",
-                timeout=120,  # bump timeout
+                timeout=timeout_seconds,
             )
             df = endpoint.get_data_frames()[0].copy()
             last_err = None
             break
-        except (ReadTimeout, ConnectionError, TimeoutError) as e:
+        except (ReadTimeout, ConnectionError, Timeout, TimeoutError) as e:
             last_err = e
+            # exponential backoff + jitter
             sleep_s = base_sleep * (2 ** (attempt - 1)) + random.uniform(0, 2)
             print(f"[WARN] stats.nba.com request failed (attempt {attempt}/{max_tries}): {e}")
             print(f"[WARN] sleeping {sleep_s:.1f}s then retrying...")
             time.sleep(sleep_s)
 
-    if last_err is not None:
+    if last_err is not None or df is None:
         raise RuntimeError(f"Failed to fetch LeagueDashPlayerStats after {max_tries} attempts") from last_err
 
-
-    # Standardize key fields (nba_api uses different names than your training set)
-    # Common columns available: PLAYER_NAME, TEAM_ABBREVIATION, GP, MIN, PTS, REB, AST, STL, BLK, FG_PCT, FG3_PCT, FT_PCT
     needed = {
         "PLAYER_NAME", "TEAM_ABBREVIATION", "GP", "MIN",
         "PTS", "REB", "AST", "STL", "BLK",
@@ -96,11 +129,8 @@ def main(season_end_year: int = 2026) -> None:
 
     out["player_key"] = out["player_name"].apply(normalize_name_to_key)
 
-    # Timestamp
     out["last_updated_utc"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    # Light MVP-candidate filter (optional): avoid deep bench noise
-    # You can tune later; this just keeps file manageable.
     out = out[(out["games_played"] >= 5) & (out["minutes_played"] >= 15)].copy()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -113,5 +143,4 @@ def main(season_end_year: int = 2026) -> None:
 
 
 if __name__ == "__main__":
-    # Set end year to current season end year as needed
     main(season_end_year=2026)
