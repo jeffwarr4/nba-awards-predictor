@@ -8,8 +8,8 @@ on:
         required: false
         default: "false"
   schedule:
-    # Mondays 17:15 UTC (~9:15am Pacific in standard time)
-    - cron: "15 17 * * 1"
+    # Tuesdays 11:00am Pacific (19:00 UTC, standard time)
+    - cron: "0 19 * * 2"
 
 permissions:
   contents: read
