@@ -1,11 +1,11 @@
 player_key,rank,rank_delta,movement,player_name,team,position,model_score,games,team_games,minutes,pts,reb,ast,stl,blk,fg_pct,fg3_pct,ft_pct,team_record,team_win_pct,conf_rank,conference,season,week,stats_through,updated_utc,chips,why_blurb
-luka_doncic_lal,1,,NEW,Luka Dončić,LAL,PG,0.945714,4,5,35.5,36.0,6.8,8.3,1.3,0.5,0.484,0.396,0.875,4-1,0.8,3,West,2027,2,2026-10-29,2026-10-31 07:22,,
-alperen_sengun_hou,2,,NEW,Alperen Şengün,HOU,C,0.901676,4,5,34.0,24.5,9.0,7.0,1.8,0.5,0.581,0.667,0.769,5-0,1.0,1,West,2027,2,2026-10-29,2026-10-31 07:22,,
-ty_jerome_mem,3,,NEW,Ty Jerome,MEM,SG,0.827663,5,5,29.8,25.8,3.2,5.6,1.0,0.2,0.473,0.344,0.889,5-0,1.0,1,West,2027,2,2026-10-29,2026-10-31 07:22,,
-victor_wembanyama_sas,4,,NEW,Victor Wembanyama,SAS,C,0.827167,5,5,32.2,25.0,11.4,2.8,1.4,3.8,0.48,0.276,0.767,3-2,0.6,6,West,2027,2,2026-10-29,2026-10-31 07:22,,
-jayson_tatum_bos,5,,NEW,Jayson Tatum,BOS,PF,0.819852,4,4,36.3,28.0,6.3,8.0,1.0,0.3,0.43,0.241,0.861,3-1,0.75,3,East,2027,2,2026-10-29,2026-10-31 07:22,,
-kevin_durant_hou,6,,NEW,Kevin Durant,HOU,PF,0.813142,5,5,34.4,22.4,6.2,3.6,0.4,1.8,0.54,0.5,0.872,5-0,1.0,1,West,2027,2,2026-10-29,2026-10-31 07:22,,
-cooper_flagg_dal,7,,NEW,Cooper Flagg,DAL,SF,0.80343,4,5,30.8,25.3,5.3,6.8,2.8,1.3,0.522,0.318,0.917,3-2,0.6,6,West,2027,2,2026-10-29,2026-10-31 07:22,,
-tyrese_maxey_phi,8,,NEW,Tyrese Maxey,PHI,PG,0.797437,5,5,37.6,28.4,4.2,4.6,1.8,0.8,0.462,0.324,0.865,4-1,0.8,1,East,2027,2,2026-10-29,2026-10-31 07:22,,
-cade_cunningham_det,9,,NEW,Cade Cunningham,DET,PG,0.796855,5,5,34.6,22.6,5.6,7.8,1.2,1.4,0.459,0.364,0.719,4-1,0.8,1,East,2027,2,2026-10-29,2026-10-31 07:22,,
-cameron_boozer_mem,10,,NEW,Cameron Boozer,MEM,PF,0.769825,5,5,32.2,15.8,10.8,6.2,0.4,0.6,0.338,0.355,0.952,5-0,1.0,1,West,2027,2,2026-10-29,2026-10-31 07:22,,
+luka_doncic_lal,1,,NEW,Luka Dončić,LAL,PG,0.945714,4,5,35.5,36.0,6.8,8.3,1.3,0.5,0.484,0.396,0.875,4-1,0.8,3,West,2027,2,2026-10-29,2026-10-31 08:05,Scoring machine | Playmaking engine | Efficient shooting,Averages 36.0 PPG and 8.3 APG while shooting .484 from the field and .396 from three on a 4-1 team.
+alperen_sengun_hou,2,,NEW,Alperen Şengün,HOU,C,0.901676,4,5,34.0,24.5,9.0,7.0,1.8,0.5,0.581,0.667,0.769,5-0,1.0,1,West,2027,2,2026-10-29,2026-10-31 08:05,Scoring machine | Efficient shooting | Playmaking big,Averages 24.5 PPG on .581 FG with 9.0 RPG and 7.0 APG while his team is 5-0.
+ty_jerome_mem,3,,NEW,Ty Jerome,MEM,SG,0.827663,5,5,29.8,25.8,3.2,5.6,1.0,0.2,0.473,0.344,0.889,5-0,1.0,1,West,2027,2,2026-10-29,2026-10-31 08:05,Scoring machine | Efficient shooter | Winning team,Averages 25.8 PPG on .473 FG and .344 3P shooting while his team is 5-0.
+victor_wembanyama_sas,4,,NEW,Victor Wembanyama,SAS,C,0.827167,5,5,32.2,25.0,11.4,2.8,1.4,3.8,0.48,0.276,0.767,3-2,0.6,6,West,2027,2,2026-10-29,2026-10-31 08:05,,
+jayson_tatum_bos,5,,NEW,Jayson Tatum,BOS,PF,0.819852,4,4,36.3,28.0,6.3,8.0,1.0,0.3,0.43,0.241,0.861,3-1,0.75,3,East,2027,2,2026-10-29,2026-10-31 08:05,,
+kevin_durant_hou,6,,NEW,Kevin Durant,HOU,PF,0.813142,5,5,34.4,22.4,6.2,3.6,0.4,1.8,0.54,0.5,0.872,5-0,1.0,1,West,2027,2,2026-10-29,2026-10-31 08:05,,
+cooper_flagg_dal,7,,NEW,Cooper Flagg,DAL,SF,0.80343,4,5,30.8,25.3,5.3,6.8,2.8,1.3,0.522,0.318,0.917,3-2,0.6,6,West,2027,2,2026-10-29,2026-10-31 08:05,,
+tyrese_maxey_phi,8,,NEW,Tyrese Maxey,PHI,PG,0.797437,5,5,37.6,28.4,4.2,4.6,1.8,0.8,0.462,0.324,0.865,4-1,0.8,1,East,2027,2,2026-10-29,2026-10-31 08:05,,
+cade_cunningham_det,9,,NEW,Cade Cunningham,DET,PG,0.796855,5,5,34.6,22.6,5.6,7.8,1.2,1.4,0.459,0.364,0.719,4-1,0.8,1,East,2027,2,2026-10-29,2026-10-31 08:05,,
+cameron_boozer_mem,10,,NEW,Cameron Boozer,MEM,PF,0.769825,5,5,32.2,15.8,10.8,6.2,0.4,0.6,0.338,0.355,0.952,5-0,1.0,1,West,2027,2,2026-10-29,2026-10-31 08:05,,

@@ -1,2 +1,2 @@
 ﻿season,season_end_year,week_label_current,week_label_prior,last_updated_utc,model_version,notes
-2026-27,2027,Week 2,Week 1,2026-10-31T07:23:11Z,ridge_np_v2_hybrid_team,Ridge (numpy) predicts vote_share; blended with team win% + conf rank. Basketball-Reference stats.
+2026-27,2027,Week 2,Week 1,2026-10-31T08:05:52Z,ridge_np_v2_hybrid_team,Ridge (numpy) predicts vote_share; blended with team win% + conf rank. Basketball-Reference stats.
