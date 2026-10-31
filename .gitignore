@@ -24,7 +24,10 @@ Thumbs.db
 *.pem
 
 # Data (keep raw/processed out of git by default)
-data/raw/
+data/raw/*
+# The MVP vote seed is tracked (src/data/fetch_mvp_votes.py); the Basketball-Reference
+# page cache (data/raw/bbref_cache/, ~190 MB) is not.
+!data/raw/voting/
 
 # Ignore everything in processed by default
 data/processed/*
@@ -32,6 +35,10 @@ data/processed/*
 # But allow the folder itself
 !data/processed/current
 !data/processed/outputs
+
+# Training data: normalized votes, vote-getter dataset, every player-season (src/data/build_history.py)
+!data/processed/voting/
+!data/processed/training/
 
 # Allow seed snapshots (one-time committed files)
 !data/processed/seeds/

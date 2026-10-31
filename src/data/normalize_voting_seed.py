@@ -80,7 +80,9 @@ def main() -> None:
     if not RAW_PATH.exists():
         raise FileNotFoundError(f"Seed file not found: {RAW_PATH}")
 
-    df = pd.read_csv(RAW_PATH, encoding="cp1252", encoding_errors="replace")
+    # src/data/fetch_mvp_votes.py writes UTF-8. The original hand export was cp1252,
+    # which turned accented names into '?' (Nikola Joki?).
+    df = pd.read_csv(RAW_PATH, encoding="utf-8")
 
 
     # ---- Basic validation ----

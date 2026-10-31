@@ -1,0 +1,44 @@
+# .github/workflows/probe_sources.yml
+# ---------------------------------------------------------------
+# Manual-only. Checks which NBA data sources answer from a GitHub runner, so the
+# weekly board can run unattended (stats.nba.com blocks runner IPs). Commits nothing;
+# compare its table with a local run of the same script.
+# ---------------------------------------------------------------
+
+name: Probe NBA data sources
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe endpoints
+        shell: python
+        run: |
+          import time, urllib.request, urllib.error
+          URLS = [
+              ("bbref per-game",  "https://www.basketball-reference.com/leagues/NBA_2027_per_game.html"),
+              ("bbref advanced",  "https://www.basketball-reference.com/leagues/NBA_2027_advanced.html"),
+              ("bbref standings", "https://www.basketball-reference.com/leagues/NBA_2027_standings.html"),
+              ("bbref schedule",  "https://www.basketball-reference.com/leagues/NBA_2027_games-october.html"),
+              ("espn standings",  "https://site.api.espn.com/apis/v2/sports/basketball/nba/standings"),
+              ("espn stats",      "https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/statistics/byathlete?limit=5&season=2027&seasontype=2"),
+              ("stats.nba.com",   "https://stats.nba.com/stats/leaguestandingsv3?LeagueID=00&Season=2026-27&SeasonType=Regular%20Season"),
+          ]
+          for name, url in URLS:
+              t0 = time.time()
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(url), timeout=30) as r:
+                      body = r.read()
+                      status, size = r.status, len(body)
+              except urllib.error.HTTPError as e:
+                  status, size = e.code, 0
+              except Exception as e:
+                  status, size = type(e).__name__, 0
+              print(f"{name:16s} {str(status):>14s} {size:>9,d} bytes {time.time() - t0:5.1f}s")
+              time.sleep(4)   # Sports-Reference allows ~20 requests/minute
