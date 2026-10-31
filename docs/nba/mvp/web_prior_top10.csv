@@ -1,11 +1,11 @@
-﻿player_key,rank
-nikola_jokic,1
-shai_gilgeousalexander,2
-cade_cunningham,3
-luka_doncic,4
-victor_wembanyama,5
-jaylen_brown,6
-tyrese_maxey,7
-jamal_murray,8
-jalen_duren,9
-chet_holmgren,10
+﻿season,season_end_year,rank,player_key,player_name,team,mvp_score,ridge_pred_vote_share,team_win_pct,team_conf_rank,team_conference,pts,trb,ast,stl,blk,games_played,rank_delta,mover_label,last_updated_utc
+2025-26,2026,1,nikola_jokic,Nikola Jokić,DEN,0.9434804288207429,0.6166589946279336,0.659,3,West,27.7,12.9,10.7,1.4,0.8,65,0.0,—,2026-04-15T06:25:58Z
+2025-26,2026,2,shai_gilgeousalexander,Shai Gilgeous-Alexander,OKC,0.8943041777708624,0.38977901676797383,0.78,1,West,31.1,4.3,6.6,1.4,0.8,68,0.0,—,2026-04-15T06:25:58Z
+2025-26,2026,3,victor_wembanyama,Victor Wembanyama,SAS,0.8725309580534595,0.3763558648636301,0.756,2,West,25.0,11.5,3.1,1.0,3.1,64,0.0,—,2026-04-15T06:25:58Z
+2025-26,2026,4,luka_doncic,Luka Dončić,LAL,0.8607137774950795,0.46406969108867935,0.646,4,West,33.5,7.7,8.3,1.6,0.5,64,0.0,—,2026-04-15T06:25:58Z
+2025-26,2026,5,cade_cunningham,Cade Cunningham,DET,0.81996418525809,0.2661684041558332,0.732,1,East,23.9,5.5,9.9,1.4,0.8,64,0.0,—,2026-04-15T06:25:58Z
+2025-26,2026,6,jaylen_brown,Jaylen Brown,BOS,0.7857678417739133,0.2448092473199932,0.683,2,East,28.7,6.9,5.1,1.0,0.4,71,0.0,—,2026-04-15T06:25:58Z
+2025-26,2026,7,jalen_duren,Jalen Duren,DET,0.7778506836319466,0.17577022081201915,0.732,1,East,19.5,10.5,2.0,0.8,0.8,70,0.0,—,2026-04-15T06:25:58Z
+2025-26,2026,8,donovan_mitchell,Donovan Mitchell,CLE,0.7514999296560332,0.2386288718831011,0.634,4,East,27.9,4.5,5.7,1.5,0.3,70,1.0,↑1,2026-04-15T06:25:58Z
+2025-26,2026,9,jamal_murray,Jamal Murray,DEN,0.7502750271105111,0.2019364792250682,0.659,3,West,25.4,4.4,7.1,0.9,0.4,75,1.0,↑1,2026-04-15T06:25:58Z
+2025-26,2026,10,chet_holmgren,Chet Holmgren,OKC,0.7392968038928142,0.057049975904453896,0.78,1,West,17.1,8.9,1.7,0.6,1.9,69,,NEW,2026-04-15T06:25:58Z
