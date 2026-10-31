@@ -68,6 +68,19 @@ def build_user_message(player: pd.Series) -> str:
             f"Per-game stats: {stat_line(player)}")
 
 
+def make_client():
+    """Anthropic client with the key stripped: a secret pasted with a trailing newline makes
+    the auth header invalid, which the SDK reports only as 'Connection error.'"""
+    from anthropic import Anthropic
+    return Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"].strip())
+
+
+def describe(e: Exception) -> str:
+    """Error message plus the underlying exception's type. Never the cause's message:
+    an invalid-header error would echo the API key into the public Actions log."""
+    return f"{e} [{type(e.__cause__).__name__}]" if e.__cause__ else str(e)
+
+
 def _parse_json(text: str) -> dict:
     """First JSON object in the reply; ignores code fences and any trailing commentary."""
     text = re.sub(r"^```json|```$", "", text.strip()).strip()
@@ -96,7 +109,7 @@ def generate_chip_for_player(client, player: pd.Series, retries: int = 2) -> dic
             return {"chip": data["chip"], "why": data["why"]}
         except Exception as e:
             if attempt == retries:
-                print(f"  ! Chip generation failed for {player.get('player_name', '?')}: {e}")
+                print(f"  ! Chip generation failed for {player.get('player_name', '?')}: {describe(e)}")
                 return {"chip": "", "why": ""}
             time.sleep(1.5)
 
@@ -124,7 +137,7 @@ def generate_bubble_why(client, player: pd.Series, comp: pd.Series | None, retri
             break
         except Exception as e:
             if attempt == retries:
-                print(f"  ! Bubble Why failed for {player.get('player_name', '?')}: {e}")
+                print(f"  ! Bubble Why failed for {player.get('player_name', '?')}: {describe(e)}")
                 return ""
             time.sleep(1.5)
     if len(why) > BUBBLE_WHY_MAX:
@@ -133,7 +146,7 @@ def generate_bubble_why(client, player: pd.Series, comp: pd.Series | None, retri
                            f"{message}\n\nYour last answer was {len(why)} characters: "
                            f'"{why}". Rewrite it in {BUBBLE_WHY_MAX} characters or fewer.')["why"]).strip()
         except Exception as e:
-            print(f"  ! Bubble Why rewrite failed for {player.get('player_name', '?')}: {e}")
+            print(f"  ! Bubble Why rewrite failed for {player.get('player_name', '?')}: {describe(e)}")
     if len(why) > BUBBLE_WHY_MAX:
         why = why[:BUBBLE_WHY_MAX - 1].rstrip(" ,;·-") + "…"
     return why
@@ -166,8 +179,7 @@ def generate_chips(board: pd.DataFrame, outdir: Path, top_n: int = 3) -> pd.Data
         print("[WARN] ANTHROPIC_API_KEY not set — chip generation skipped")
         return pd.DataFrame(columns=["player_key", "Chip", "Why"])
 
-    from anthropic import Anthropic
-    client = Anthropic()
+    client = make_client()
 
     board = board.sort_values("rank")
     rows = []

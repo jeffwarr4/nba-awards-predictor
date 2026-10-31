@@ -19,13 +19,14 @@ import json
 import os
 import re
 import time
+import unicodedata
 from pathlib import Path
 from typing import Optional
 
 import pandas as pd
 
 from config import BUBBLE_RANKS, CURRENT_PRED_DIR
-from src.publish.generate_chips import CLAUDE_MODEL, EFFORT
+from src.publish.generate_chips import CLAUDE_MODEL, EFFORT, describe, make_client
 from src.publish.stats import stat_line
 
 TEAM_HASHTAGS = {
@@ -60,6 +61,13 @@ BUBBLE_HISTORY = ("2025-26: Shai Gilgeous-Alexander sat #2 on our board from Feb
                   "with 83 of 100 first-place votes.")
 
 
+def name_tag(name: str) -> str:
+    """'Luka Dončić' → 'LukaDoncic', 'Alperen Şengün' → 'AlperenSengun'. Accents are
+    transliterated, not dropped (dropping gave #LukaDoni)."""
+    n = "".join(c for c in unicodedata.normalize("NFKD", name) if not unicodedata.combining(c))
+    return re.sub(r"[^A-Za-z0-9]", "", n)
+
+
 def _build_prompt(board: pd.DataFrame, chip_df: pd.DataFrame, week: int) -> str:
     whys = dict(zip(chip_df["player_key"], chip_df["Why"])) if not chip_df.empty else {}
     board = board.sort_values("rank")
@@ -79,7 +87,7 @@ def _build_prompt(board: pd.DataFrame, chip_df: pd.DataFrame, week: int) -> str:
         lines += [line(p) for _, p in bubble.iterrows()]
         lines += ["", f"History note: {BUBBLE_HISTORY}"]
     top3 = board.head(3)
-    name_tags = " ".join("#" + re.sub(r"[^A-Za-z0-9]", "", n) for n in top3["player_name"])
+    name_tags = " ".join("#" + name_tag(n) for n in top3["player_name"])
     team_tags = " ".join(dict.fromkeys(TEAM_HASHTAGS[t] for t in top3["team"] if t in TEAM_HASHTAGS))
     lines += ["", f"Player tags: {name_tags}", f"Team tags: {team_tags}"]
     return "\n".join(lines)
@@ -105,7 +113,7 @@ def generate_caption(client, board: pd.DataFrame, chip_df: pd.DataFrame,
             return json.loads(text)
         except Exception as e:
             if attempt == retries:
-                print(f"  ! Caption generation failed: {e}")
+                print(f"  ! Caption generation failed: {describe(e)}")
                 return None
             time.sleep(1.5)
 
@@ -117,9 +125,8 @@ def generate_caption_file(board: pd.DataFrame, chip_df: pd.DataFrame, gfx_dir: P
         print("[WARN] ANTHROPIC_API_KEY not set — caption generation skipped")
         return None
 
-    from anthropic import Anthropic
     print("  Generating caption: NBA MVP")
-    data = generate_caption(Anthropic(), board, chip_df, season, week)
+    data = generate_caption(make_client(), board, chip_df, season, week)
     if data is None:
         return None
 
