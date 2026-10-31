@@ -82,7 +82,7 @@ Rejected: training a ridge on every player (E1, E3–E5), advanced stats in the 
 E8 (NHL blend + advanced stats) is the one challenger worth watching. Running it as an unpublished weekly shadow score was considered and deferred; revisit after the 2026-27 vote with `python -m src.model.experiments E0 E8`.
 
 Weekly scoring changes:
-- Eligibility: ≥5 games, ≥15 min/game (as before) **and** can still reach 62 games (G + team games remaining ≥ 62).
+- Eligibility: played ≥ 60% of his team's games, ≥15 min/game, **and** can still reach 62 games (G + team games remaining ≥ 62). The old fixed ≥5 games emptied most rosters in week 2 of 2026-27 (teams had played 3–6); the 60% share is NHL's rule and left every replay checkpoint's ranks unchanged.
 - Games played projected to an 82-game pace before scoring; displayed stats stay actual.
 
 ## 2026-27 build plan (port of nhl-awards-predictor patterns)

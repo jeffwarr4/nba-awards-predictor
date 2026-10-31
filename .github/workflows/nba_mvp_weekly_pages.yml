@@ -1,23 +1,50 @@
-name: NBA MVP Weekly Refresh (Publish to Pages)
+# .github/workflows/nba_mvp_weekly_pages.yml
+# ---------------------------------------------------------------
+# Weekly NBA MVP board. Runs Tuesdays 17:43 UTC, October–April, plus manual runs.
+# Unattended: Basketball-Reference answers from GitHub runners (probe_sources.yml);
+# stats.nba.com does not, which is why the old pipeline needed a local refresh.
+#
+# What it does:
+#   1. Checks out stinger-assets as a sibling (headshots + logos for the graphics)
+#   2. Runs src/predict_current.py:
+#        predictions/{season}/: top10 + 30-deep board CSVs, movement snapshot,
+#          chips, board + bubble PNGs, carousel caption
+#        predictions/nba_candidates.csv (stinger-assets headshot sync)
+#        data/processed/outputs/: the legacy Google Sheet feed
+#      It exits 0 with skipped=true when no games were played since the last board
+#      (before opening night, after the regular season); every later step is skipped.
+#   3. Fails loudly if the top-10 board is empty
+#   4. Builds the Canva flats, copies the legacy feed to docs/nba/mvp/, deploys Pages
+#   5. Uploads CSVs + PNGs + caption as artifacts and commits predictions/ + docs/nba/mvp/
+#
+# The model is NOT retrained here — models/nba_mvp_ridge_np.json is committed.
+# Retrain locally (python -m src.model.train_mvp) and commit when data changes.
+#
+# Secrets (repo Settings → Secrets → Actions):
+#   ANTHROPIC_API_KEY — chips, Whys and caption; without it those steps are skipped
+# ---------------------------------------------------------------
+
+name: NBA MVP Weekly Refresh
 
 on:
+  schedule:
+    # Tuesdays 17:43 UTC, October–April (regular season). Kept off :00, when
+    # GitHub delays or drops scheduled runs.
+    - cron: "43 17 * 10-12,1-4 2"
   workflow_dispatch:
     inputs:
-      use_seed_prior:
-        description: "Force use of seed prior snapshot for this run (bootstrap Movers)"
+      force:
+        description: "Rebuild even if no games were played since the last board"
         required: false
         default: "false"
-  schedule:
-    # Tuesdays 10:00am Pacific (18:00 UTC, standard time)
-    - cron: "0 18 * * 2"
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 concurrency:
-  group: nba-mvp-weekly-pages
+  group: nba-mvp-weekly
   cancel-in-progress: false
 
 jobs:
@@ -30,114 +57,105 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      # Sibling checkout so STINGER_ASSETS_DIR matches the ../stinger-assets/
+      # convention used locally. Asset filenames are lowercase — the runner's
+      # filesystem is case-sensitive even though Windows isn't.
+      - name: Checkout stinger-assets
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          repository: jeffwarr4/stinger-assets
+          path: stinger-assets
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: "pip"
+          python-version: "3.12"
+          cache: pip
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # IMPORTANT: Do NOT call stats.nba.com here
-      # Require that cached/current candidates CSVs exist in the repo.
-      - name: Verify cached input files exist (freshness gate)
+      # The Sheet's "prior" tab: whatever was last published to Pages.
+      - name: Prepare web_prior_top10.csv (last published board)
         run: |
-          set -euo pipefail
-          ls -la data/processed/current/nba_mvp_current_candidates.csv
-          ls -la data/processed/current/nba_team_standings.csv
-
-          python - << 'PY'
-          import os, datetime
-
-          def check(path, max_age_days=10):
-            mtime = datetime.datetime.fromtimestamp(os.path.getmtime(path), tz=datetime.timezone.utc)
-            age_hours = (datetime.datetime.now(datetime.timezone.utc) - mtime).total_seconds() / 3600
-            print(f"[INFO] {path} age_hours={age_hours:.1f}")
-            if age_hours > max_age_days * 24:
-              raise SystemExit(f"{path} is too old. Refresh locally and push.")
-
-          check("data/processed/current/nba_mvp_current_candidates.csv")
-          check("data/processed/current/nba_team_standings.csv")
-          PY
-
-      # Prior logic:
-      # - workflow_dispatch + use_seed_prior=true => seed wins
-      # - otherwise => pull last published current from Pages
-      # - if neither exists => fail loudly
-      - name: Prepare web_prior_top10.csv (seed opt-in -> Pages -> fail)
-        shell: bash
-        run: |
-          set -euo pipefail
           mkdir -p data/processed/outputs
+          curl -L --fail --silent --show-error -o data/processed/outputs/web_prior_top10.csv \
+            "https://jeffwarr4.github.io/nba-awards-predictor/nba/mvp/web_current_top10.csv" \
+            || cp data/processed/seeds/mvp_prior_top10_seed.csv data/processed/outputs/web_prior_top10.csv
 
-          PRIOR_OUT="data/processed/outputs/web_prior_top10.csv"
-          PAGES_URL="https://jeffwarr4.github.io/nba-awards-predictor/nba/mvp/web_current_top10.csv"
-          SEED_IN="data/processed/seeds/mvp_prior_top10_seed.csv"
+      - name: Run current-season predictions + weekly board
+        id: predict
+        run: python -m src.predict_current ${{ github.event.inputs.force == 'true' && '--force' || '' }}
+        env:
+          PYTHONIOENCODING: utf-8
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          STINGER_ASSETS_DIR: ${{ github.workspace }}/stinger-assets
 
-          USE_SEED="${{ github.event.inputs.use_seed_prior || 'false' }}"
-          echo "[INFO] use_seed_prior=${USE_SEED}"
-
-          if [ "${USE_SEED}" = "true" ]; then
-            if [ -f "$SEED_IN" ]; then
-              echo "[INFO] Forcing seed prior snapshot: $SEED_IN"
-              cp "$SEED_IN" "$PRIOR_OUT"
-            else
-              echo "[ERROR] use_seed_prior=true but seed file missing: $SEED_IN"
-              exit 1
-            fi
-          else
-            echo "[INFO] Trying to download prior from Pages (last published current)..."
-            if curl -L --fail --silent --show-error -o "$PRIOR_OUT" "$PAGES_URL"; then
-              echo "[INFO] Prior loaded from Pages: $PAGES_URL"
-            elif [ -f "$SEED_IN" ]; then
-              echo "[WARN] Pages prior not found. Using seed file: $SEED_IN"
-              cp "$SEED_IN" "$PRIOR_OUT"
-            else
-              echo "[ERROR] No prior available (Pages missing AND seed missing)."
-              exit 1
-            fi
+      # predict_current exits non-zero before writing on an empty or short board;
+      # this double-checks the file it wrote so a silent regression can't publish a header-only CSV.
+      - name: Fail if the top-10 board is empty
+        if: steps.predict.outputs.skipped != 'true'
+        run: |
+          YEAR=$(python -c "import config; print(config.SEASON_END_YEAR)")
+          CSV="predictions/${YEAR}/top10_mvp_latest.csv"
+          ROWS=$(( $(wc -l < "$CSV") - 1 ))
+          echo "$CSV has $ROWS rows"
+          if [ "$ROWS" -lt 1 ]; then
+            echo "::error::Top-10 MVP board is empty"
+            exit 1
           fi
 
-          echo "[INFO] Prior preview:"
-          head -n 12 "$PRIOR_OUT"
-
-      - name: Run NBA MVP pipeline (from cached inputs)
-        env:
-          MVP_PRIOR_TOP10_PATH: data/processed/outputs/web_prior_top10.csv
-          FAIL_ON_MISSING_PRIOR: "1"
-          WRITE_LOCAL_PRIOR_SNAPSHOT: "0"
+      # Legacy feed for the website's Google Sheet (IMPORTDATA of the Pages files).
+      - name: Build Canva flats + copy the legacy feed to docs/
+        if: steps.predict.outputs.skipped != 'true'
         run: |
-          set -euo pipefail
-          python -m src.model.build_rankings_ridge_np_v1
           python -m src.publish.build_canva_flat_nba
-
-      - name: Verify outputs exist before publish_pages
-        run: |
-          set -euo pipefail
-          ls -la data/processed/outputs
-          test -f data/processed/outputs/canva_top5_flat.csv || (echo "MISSING canva_top5_flat.csv" && exit 1)
-          test -f data/processed/outputs/canva_6_10_flat.csv || (echo "MISSING canva_6_10_flat.csv" && exit 1)
-
-      - name: Publish outputs into docs/
-        run: |
-          set -euo pipefail
           python -m src.publish.publish_pages
-          ls -la docs/nba/mvp
+
+      - name: Upload prediction artifacts
+        if: steps.predict.outputs.skipped != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nba-mvp-${{ github.run_number }}
+          path: |
+            predictions/**/*.csv
+            predictions/**/*.png
+            predictions/**/*.txt
+          retention-days: 90
+          if-no-files-found: warn
+
+      - name: Commit updated predictions
+        if: steps.predict.outputs.skipped != 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          YEAR=$(python -c "import config; print(config.SEASON_END_YEAR)")
+          git add predictions/ docs/nba/mvp/*.csv
+          # Hidden movement baseline (30 rows); -f in case a global ignore covers dotfiles
+          if [ -f "predictions/${YEAR}/.prev_board_mvp.csv" ]; then
+            git add -f "predictions/${YEAR}/.prev_board_mvp.csv"
+          fi
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Automated NBA MVP update $(date -u +'%Y-%m-%d %H:%M UTC') [skip ci]"
+            git push
+          fi
 
       - name: Setup Pages
+        if: steps.predict.outputs.skipped != 'true'
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
+        if: steps.predict.outputs.skipped != 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
 
       - name: Deploy to GitHub Pages
+        if: steps.predict.outputs.skipped != 'true'
         id: deployment
         uses: actions/deploy-pages@v4
