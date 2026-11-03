@@ -1,6 +1,6 @@
 # .github/workflows/nba_mvp_weekly_pages.yml
 # ---------------------------------------------------------------
-# Weekly NBA MVP board. Runs Tuesdays 17:43 UTC, October–April, plus manual runs.
+# Weekly NBA MVP board. Runs Saturdays 17:43 UTC, October–April, plus manual runs.
 # Unattended: Basketball-Reference answers from GitHub runners (probe_sources.yml);
 # stats.nba.com does not, which is why the old pipeline needed a local refresh.
 #
@@ -28,9 +28,9 @@ name: NBA MVP Weekly Refresh
 
 on:
   schedule:
-    # Tuesdays 17:43 UTC, October–April (regular season). Kept off :00, when
+    # Saturdays 17:43 UTC, October–April (regular season). Kept off :00, when
     # GitHub delays or drops scheduled runs.
-    - cron: "43 17 * 10-12,1-4 2"
+    - cron: "43 17 * 10-12,1-4 6"
   workflow_dispatch:
     inputs:
       force:
