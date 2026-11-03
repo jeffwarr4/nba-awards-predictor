@@ -1,6 +1,6 @@
 # .github/workflows/nba_mvp_weekly_pages.yml
 # ---------------------------------------------------------------
-# Weekly NBA MVP board. Runs Saturdays 17:43 UTC, October–April, plus manual runs.
+# Weekly NBA MVP board. Runs Saturdays 15:17 UTC (Cloudflare Worker), October–April, plus manual runs.
 # Unattended: Basketball-Reference answers from GitHub runners (probe_sources.yml);
 # stats.nba.com does not, which is why the old pipeline needed a local refresh.
 #
@@ -29,9 +29,11 @@ run-name: ${{ (github.event_name == 'schedule' || inputs.scheduled == 'true') &&
 
 on:
   schedule:
-    # Saturdays 17:43 UTC, October–April (regular season). Kept off :00, when
+    # Started on time by the stinger-scheduler Cloudflare Worker (stinger-website/scheduler) at 15:17 UTC;
+    # this cron is the late backup, and the guard job makes it a no-op once the Worker's run succeeded.
+    # Saturdays 17:17 UTC, October–April (regular season). Kept off :00, when
     # GitHub delays or drops scheduled runs.
-    - cron: "43 17 * 10-12,1-4 6"
+    - cron: "17 17 * 10-12,1-4 6"
   workflow_dispatch:
     inputs:
       scheduled:
