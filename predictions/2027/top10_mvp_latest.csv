@@ -1,11 +1,11 @@
 player_key,rank,rank_delta,movement,player_name,team,position,model_score,games,team_games,minutes,pts,reb,ast,stl,blk,fg_pct,fg3_pct,ft_pct,team_record,team_win_pct,conf_rank,conference,season,week,stats_through,updated_utc,chips,why_blurb
-luka_doncic_lal,1,0,–,Luka Dončić,LAL,PG,1.0,9,10,36.0,40.1,7.8,7.7,1.7,0.7,0.498,0.419,0.873,8-2,0.8,1,West,2027,3,2026-11-06,2026-11-07 15:19,Scoring machine | Elite efficiency | Winning team,Averages 40.1 PPG on .498 FG and .419 from three while his team goes 8-2.
-victor_wembanyama_sas,2,2,↑2,Victor Wembanyama,SAS,C,0.929659,9,9,31.0,29.1,12.6,3.0,1.2,4.2,0.492,0.286,0.757,7-2,0.778,2,West,2027,3,2026-11-06,2026-11-07 15:19,Scoring machine | Rim protector | Glass cleaner,"Averaging 29.1 PPG, 12.6 RPG, and 4.2 BPG while the team has gone 7-2."
-jayson_tatum_bos,3,2,↑2,Jayson Tatum,BOS,SF,0.782891,8,9,34.4,27.9,6.3,8.0,0.8,0.5,0.433,0.286,0.888,7-2,0.778,2,East,2027,3,2026-11-06,2026-11-07 15:19,Scoring machine | Playmaking wing | Winning team,"Averages 27.9 points, 8.0 assists, and 6.3 rebounds per game while the team goes 7-2."
-alperen_sengun_hou,4,-2,↓2,Alperen Şengün,HOU,C,0.772987,7,9,35.1,22.4,9.1,8.1,1.3,1.1,0.541,0.5,0.744,7-2,0.778,2,West,2027,3,2026-11-06,2026-11-07 15:19,,
-shai_gilgeous_alexander_okc,5,9,↑9,Shai Gilgeous-Alexander,OKC,PG,0.760972,9,9,33.2,29.9,4.1,4.4,1.1,1.1,0.453,0.375,0.855,7-2,0.778,2,West,2027,3,2026-11-06,2026-11-07 15:19,,
-cade_cunningham_det,6,3,↑3,Cade Cunningham,DET,PG,0.754625,8,8,33.4,24.0,5.6,7.6,1.6,1.1,0.472,0.327,0.8,6-2,0.75,3,East,2027,3,2026-11-06,2026-11-07 15:19,,
-nikola_jokic_den,7,6,↑6,Nikola Jokić,DEN,C,0.753475,7,7,36.0,23.4,9.7,9.3,2.1,1.1,0.504,0.219,0.879,4-3,0.571,9,West,2027,3,2026-11-06,2026-11-07 15:19,,
-tyrese_maxey_phi,8,0,–,Tyrese Maxey,PHI,PG,0.731549,10,10,36.5,26.9,3.7,5.3,1.5,0.7,0.474,0.333,0.845,8-2,0.8,1,East,2027,3,2026-11-06,2026-11-07 15:19,,
-walker_kessler_lal,9,17,↑17,Walker Kessler,LAL,C,0.688761,10,10,31.2,14.6,10.4,1.2,1.3,2.4,0.716,,0.571,8-2,0.8,1,West,2027,3,2026-11-06,2026-11-07 15:19,,
-stephen_curry_gsw,10,,NEW,Stephen Curry,GSW,PG,0.685524,7,9,28.7,29.9,3.7,4.4,1.3,0.1,0.469,0.44,0.982,6-3,0.667,7,West,2027,3,2026-11-06,2026-11-07 15:19,,
+luka_doncic_lal,1,0,–,Luka Dončić,LAL,PG,1.0,11,13,35.9,38.6,7.5,7.6,2.0,0.7,0.489,0.408,0.866,11-2,0.846,1,West,2027,4,2026-11-13,2026-11-14 15:19,Scoring machine | Efficient shooting | Winning team,"Averaging 38.6 PPG on .489 FG and .408 from three, with 7.6 APG, for an 11-2 team."
+victor_wembanyama_sas,2,0,–,Victor Wembanyama,SAS,C,0.987145,13,13,29.3,28.8,11.7,3.1,1.2,4.2,0.539,0.315,0.772,11-2,0.846,1,West,2027,4,2026-11-13,2026-11-14 15:19,Scoring machine | Glass cleaner | Rim protector,"Posts 28.8 PPG and 11.7 RPG on .539 FG shooting, with 4.2 BPG while the team is 11-2."
+jayson_tatum_bos,3,0,–,Jayson Tatum,BOS,SF,0.827866,11,12,34.0,26.3,6.1,7.5,0.6,0.8,0.413,0.306,0.888,10-2,0.833,1,East,2027,4,2026-11-13,2026-11-14 15:19,Scoring machine | Playmaking wing | Winning team,Averages 26.3 PPG and 7.5 APG while Boston is 10-2 (.833 win pct).
+alperen_sengun_hou,4,0,–,Alperen Şengün,HOU,C,0.817134,11,13,35.2,23.1,9.6,7.6,1.1,1.1,0.544,0.458,0.712,10-3,0.769,3,West,2027,4,2026-11-13,2026-11-14 15:19,,
+cade_cunningham_det,5,1,↑1,Cade Cunningham,DET,PG,0.805241,11,11,34.5,25.0,5.2,7.9,1.5,0.9,0.485,0.314,0.836,8-3,0.727,3,East,2027,4,2026-11-13,2026-11-14 15:19,,
+nikola_jokic_den,6,1,↑1,Nikola Jokić,DEN,C,0.802782,10,10,36.3,23.5,10.8,9.0,1.8,1.2,0.5,0.233,0.872,6-4,0.6,9,West,2027,4,2026-11-13,2026-11-14 15:19,,
+giannis_antetokounmpo_mia,7,4,↑4,Giannis Antetokounmpo,MIA,PF,0.795718,12,12,32.5,28.5,12.3,4.9,0.8,1.0,0.583,0.241,0.609,6-6,0.5,5,East,2027,4,2026-11-13,2026-11-14 15:19,,
+tyrese_maxey_phi,8,0,–,Tyrese Maxey,PHI,PG,0.774665,13,13,36.2,26.7,3.4,5.5,1.3,0.6,0.498,0.356,0.862,10-3,0.769,2,East,2027,4,2026-11-13,2026-11-14 15:19,,
+walker_kessler_lal,9,0,–,Walker Kessler,LAL,C,0.767637,13,13,30.8,14.5,10.8,1.8,1.2,2.2,0.675,,0.614,11-2,0.846,1,West,2027,4,2026-11-13,2026-11-14 15:19,,
+austin_reaves_lal,10,3,↑3,Austin Reaves,LAL,SG,0.766098,12,13,35.3,24.7,3.3,4.7,1.2,0.3,0.513,0.409,0.915,11-2,0.846,1,West,2027,4,2026-11-13,2026-11-14 15:19,,
