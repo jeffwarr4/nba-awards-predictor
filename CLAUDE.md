@@ -100,6 +100,13 @@ Backtests score every player with ≥5 G and ≥15 min, never just vote-getters,
   `generate_captions.py: TEAM_HASHTAGS` (written from memory; not yet checked against the teams' current tags).
   Player hashtags transliterate accents (`name_tag`: `#LukaDoncic`); stripping non-ASCII gave `#LukaDoni`.
 
+**Weekly and final boards (`scripts/snapshot_board.py`, the same file in all four awards repos).** The
+workflow's "Keep this week's board" step, just before the commit, copies `board_mvp_latest.csv` to `board_mvp_wkNN.csv` (NN = `week`), which is never
+pruned (`ARCHIVES_TO_KEEP` only prunes the timestamped run files). A same-week rerun overwrites that copy. After the
+season's last regular-season board, run `python scripts/snapshot_board.py --final` once and commit: it writes
+`board_mvp_final.csv`, which the website's season archive pages read. Don't edit or delete the weekly or final files; they're the
+season history.
+
 ## Output contract (website)
 
 When the site switches over it reads `predictions/{season}/board_mvp_latest.csv` from raw.githubusercontent.com, by
