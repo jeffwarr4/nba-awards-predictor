@@ -1,0 +1,11 @@
+rank,player_key,player_name,team,games,pts,reb,ast,stl,blk,team_win_pct,conf_rank,conference,model_score,season
+1,nikola_jokic,Nikola Jokić,DEN,65,27.7,12.9,10.7,1.4,0.8,0.659,3,West,0.9435,2025-26
+2,shai_gilgeousalexander,Shai Gilgeous-Alexander,OKC,68,31.1,4.3,6.6,1.4,0.8,0.78,1,West,0.8943,2025-26
+3,victor_wembanyama,Victor Wembanyama,SAS,64,25.0,11.5,3.1,1.0,3.1,0.756,2,West,0.8725,2025-26
+4,luka_doncic,Luka Dončić,LAL,64,33.5,7.7,8.3,1.6,0.5,0.646,4,West,0.8607,2025-26
+5,cade_cunningham,Cade Cunningham,DET,64,23.9,5.5,9.9,1.4,0.8,0.732,1,East,0.82,2025-26
+6,jaylen_brown,Jaylen Brown,BOS,71,28.7,6.9,5.1,1.0,0.4,0.683,2,East,0.7858,2025-26
+7,jalen_duren,Jalen Duren,DET,70,19.5,10.5,2.0,0.8,0.8,0.732,1,East,0.7779,2025-26
+8,donovan_mitchell,Donovan Mitchell,CLE,70,27.9,4.5,5.7,1.5,0.3,0.634,4,East,0.7515,2025-26
+9,jamal_murray,Jamal Murray,DEN,75,25.4,4.4,7.1,0.9,0.4,0.659,3,West,0.7503,2025-26
+10,chet_holmgren,Chet Holmgren,OKC,69,17.1,8.9,1.7,0.6,1.9,0.78,1,West,0.7393,2025-26
