@@ -5,6 +5,7 @@ requests==2.32.5
 beautifulsoup4==4.14.3
 lxml==6.0.2
 pillow==13.0.0
+imageio-ffmpeg==0.8.1  # bundled ffmpeg (H.264) for the weekly reel; no system ffmpeg needed
 anthropic==2.3.0
 # Backtest / experiments (src/model/)
 scikit-learn==1.8.0

@@ -105,7 +105,32 @@ workflow's "Keep this week's board" step, just before the commit, copies `board_
 pruned (`ARCHIVES_TO_KEEP` only prunes the timestamped run files). A same-week rerun overwrites that copy. After the
 season's last regular-season board, run `python scripts/snapshot_board.py --final` once and commit: it writes
 `board_mvp_final.csv`, which the website's season archive pages read. Don't edit or delete the weekly or final files; they're the
-season history.
+season history. Weeks 2–4 of 2026–27 were backfilled from the workflow's commits (the step started at Week 5).
+
+## Weekly reel (`src/publish/render_reel.py`, port of the NHL and NFL reels)
+
+One story per week as a silent 1080×1920 MP4 (25 s + 2 s hold) plus a narration script Jeff records over it in
+CapCut; posted the day after the board. `python -m src.publish.render_reel [--outdir DIR] [--frames-only]
+[--no-script] [--story FILE]`; tests: `python -m pytest tests/`.
+- `reel_story.pick_story` (pure) takes the first match: new No. 1 (or "back at No. 1" if he held it on an earlier
+  `board_mvp_wkNN.csv`), biggest climber into the top 5, 11+ into the top 10, biggest drop by a former top-5
+  player, else a profile of No. 1. Players are matched by `player_key`, as in `.prev_board_mvp.csv`, so a player
+  traded since last week reads as NEW.
+- `reel_script.py` writes five timed beats in Jeff's first-person voice on `REEL_MODEL` (Opus 5.5; chips stay on
+  Haiku) with the per-game stats, W-L record, conference rank and the player's rank on earlier weekly boards. It
+  checks the word count, the closing line, and that no %/odds language slipped in (so captions write "FG .602", not
+  "FG%"). The player hashtag uses `generate_captions.name_tag` (accents transliterated). Settings are `REEL_*` in
+  `config.py`. Needs anthropic 2.x (`fallbacks`); an old local SDK fails the script call.
+- The background is the board's hardwood tinted dark brown (`PLATE`), and the header band is shown as a
+  gold-bordered badge. The Why scene shows the same four stats as the board card (`player_stats`), in box-score
+  order (PPG first) so they follow the narration.
+- Outputs in `predictions/{season}/reel/`: `reel_script.txt` and `reel_meta.json` are committed; `reel_latest.mp4`
+  is gitignored and the workflow uploads it to the repo's `reel-latest` release as `nba_reel_{season}_wk{NN}.mp4`.
+  stinger-website's social-drafts job emails it with the script. Both workflow steps are `continue-on-error`, after
+  the headshot fetch and skipped on a no-games week. `predict_current.py` doesn't render the reel; run it on its own
+  locally.
+- One-off reels (a correction, a feature, or a hand-written week): a story file names the player and hook and can
+  set labels, cards and a script; it writes `reel_<name>.*` beside the weekly files. Upload the MP4 by hand.
 
 ## Output contract (website)
 

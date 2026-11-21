@@ -14,14 +14,17 @@
 #      It exits 0 with skipped=true when no games were played since the last board
 #      (before opening night, after the regular season); every later step is skipped.
 #   3. Fails loudly if the top-10 board is empty
-#   4. Builds the Canva flats, copies the legacy feed to docs/nba/mvp/, deploys Pages
-#   5. Uploads CSVs + PNGs + caption as artifacts and commits predictions/ + docs/nba/mvp/
+#   4. Renders the weekly reel (MP4 + narration script) and uploads the MP4 to the
+#      "reel-latest" release; both steps are continue-on-error
+#   5. Builds the Canva flats, copies the legacy feed to docs/nba/mvp/, deploys Pages
+#   6. Uploads CSVs + PNGs + caption + reel as artifacts and commits predictions/ + docs/nba/mvp/
+#      (reel script + meta, not the MP4)
 #
 # The model is NOT retrained here — models/nba_mvp_ridge_np.json is committed.
 # Retrain locally (python -m src.model.train_mvp) and commit when data changes.
 #
 # Secrets (repo Settings → Secrets → Actions):
-#   ANTHROPIC_API_KEY — chips, Whys and caption; without it those steps are skipped
+#   ANTHROPIC_API_KEY — chips, Whys, caption and reel script; without it those steps are skipped
 # ---------------------------------------------------------------
 
 name: NBA MVP Weekly Refresh
@@ -162,6 +165,38 @@ jobs:
           PYTHONIOENCODING: utf-8
           STINGER_ASSETS_DIR: ${{ github.workspace }}/stinger-assets
 
+      # Weekly reel (one story, silent MP4 + narration script Jeff records; posted the day after the board).
+      # Extra: neither step can fail the run, so a reel problem never blocks the board commit or the site.
+      - name: Render the reel
+        id: reel
+        if: steps.predict.outputs.skipped != 'true'
+        continue-on-error: true
+        run: python -m src.publish.render_reel
+        env:
+          PYTHONIOENCODING: utf-8
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          STINGER_ASSETS_DIR: ${{ github.workspace }}/stinger-assets
+
+      # The MP4 isn't committed. It goes to one reused release, "reel-latest", named for its week
+      # (reel_meta.json: release_asset); stinger-website's social-drafts job downloads it from there and
+      # emails it. Older weeks' videos are removed from the release.
+      - name: Upload the reel to the reel-latest release
+        if: steps.reel.outcome == 'success'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          YEAR=$(python -c "import config; print(config.SEASON_END_YEAR)")
+          DIR="predictions/${YEAR}/reel"
+          ASSET=$(python -c "import json; print(json.load(open('${DIR}/reel_meta.json'))['release_asset'])")
+          cp "${DIR}/reel_latest.mp4" "${RUNNER_TEMP}/${ASSET}"
+          gh release view reel-latest >/dev/null 2>&1 || gh release create reel-latest --latest=false             --title "Weekly reel (latest)" --notes "This week's NBA MVP reel video. Replaced every week by the weekly workflow."
+          gh release upload reel-latest "${RUNNER_TEMP}/${ASSET}" --clobber
+          for old in $(gh release view reel-latest --json assets --jq ".assets[].name | select(. != \"${ASSET}\")"); do
+            gh release delete-asset reel-latest "$old" --yes
+          done
+          echo "Reel uploaded: ${ASSET}"
+
       # Legacy feed for the website's Google Sheet (IMPORTDATA of the Pages files).
       - name: Build Canva flats + copy the legacy feed to docs/
         if: steps.predict.outputs.skipped != 'true'
@@ -178,6 +213,8 @@ jobs:
             predictions/**/*.csv
             predictions/**/*.png
             predictions/**/*.txt
+            predictions/**/reel/*.mp4
+            predictions/**/reel/*.json
           retention-days: 90
           if-no-files-found: warn
 
