@@ -1,0 +1,11 @@
+player_key,rank,rank_delta,movement,player_name,team,position,model_score,games,team_games,minutes,pts,reb,ast,stl,blk,fg_pct,fg3_pct,ft_pct,team_record,team_win_pct,conf_rank,conference,season,week,stats_through,updated_utc,chips,why_blurb
+luka_doncic_lal,1,0,–,Luka Dončić,LAL,PG,1.0,14,16,36.4,38.1,7.0,7.6,1.9,0.6,0.466,0.383,0.864,13-3,0.812,1,West,2027,5,2026-11-19,2026-11-21 15:18,,
+victor_wembanyama_sas,2,0,–,Victor Wembanyama,SAS,C,0.995258,16,16,30.2,28.6,11.9,3.3,1.1,3.9,0.528,0.3,0.782,13-3,0.812,1,West,2027,5,2026-11-19,2026-11-21 15:18,,
+giannis_antetokounmpo_mia,3,4,↑4,Giannis Antetokounmpo,MIA,PF,0.876973,15,15,32.1,28.2,12.6,5.5,0.9,1.3,0.602,0.242,0.645,9-6,0.6,4,East,2027,5,2026-11-19,2026-11-21 15:18,,
+nikola_jokic_den,4,2,↑2,Nikola Jokić,DEN,C,0.843738,13,13,36.7,24.1,10.7,8.9,1.7,1.1,0.517,0.281,0.898,8-5,0.615,7,West,2027,5,2026-11-19,2026-11-21 15:18,,
+cade_cunningham_det,5,0,–,Cade Cunningham,DET,PG,0.797293,13,14,34.8,25.8,5.2,7.8,1.4,0.9,0.477,0.317,0.856,10-4,0.714,3,East,2027,5,2026-11-19,2026-11-21 15:18,,
+alperen_sengun_hou,6,-2,↓2,Alperen Şengün,HOU,C,0.791847,14,16,32.8,21.6,9.2,6.8,1.1,0.9,0.545,0.5,0.744,12-4,0.75,3,West,2027,5,2026-11-19,2026-11-21 15:18,,
+jayson_tatum_bos,7,-4,↓4,Jayson Tatum,BOS,SF,0.788671,14,15,34.1,26.4,6.6,6.8,0.7,0.7,0.428,0.333,0.865,11-4,0.733,2,East,2027,5,2026-11-19,2026-11-21 15:18,,
+tyrese_maxey_phi,8,0,–,Tyrese Maxey,PHI,PG,0.77572,15,16,36.1,26.5,3.3,5.8,1.3,0.5,0.5,0.38,0.867,13-3,0.812,1,East,2027,5,2026-11-19,2026-11-21 15:18,,
+karl_anthony_towns_nyk,9,6,↑6,Karl-Anthony Towns,NYK,C,0.757478,15,15,32.8,21.3,13.9,3.9,0.9,0.6,0.537,0.385,0.775,9-6,0.6,4,East,2027,5,2026-11-19,2026-11-21 15:18,,
+shai_gilgeous_alexander_okc,10,3,↑3,Shai Gilgeous-Alexander,OKC,PG,0.725689,15,15,33.2,31.1,4.1,4.3,0.9,0.9,0.476,0.358,0.835,9-6,0.6,8,West,2027,5,2026-11-19,2026-11-21 15:18,,

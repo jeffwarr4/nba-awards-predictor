@@ -1,0 +1,31 @@
+player_key,rank,rank_delta,movement,player_name,team,position,model_score,games,team_games,minutes,pts,reb,ast,stl,blk,fg_pct,fg3_pct,ft_pct,team_record,team_win_pct,conf_rank,conference,season,week,stats_through,updated_utc,chips,why_blurb
+luka_doncic_lal,1,0,–,Luka Dončić,LAL,PG,1.0,14,16,36.4,38.1,7.0,7.6,1.9,0.6,0.466,0.383,0.864,13-3,0.812,1,West,2027,5,2026-11-19,2026-11-21 15:18,Scoring machine | All-around playmaker | Winning team,"Averages 38.1 PPG, 7.6 APG and 7.0 RPG while the team wins at a .812 clip."
+victor_wembanyama_sas,2,0,–,Victor Wembanyama,SAS,C,0.995258,16,16,30.2,28.6,11.9,3.3,1.1,3.9,0.528,0.3,0.782,13-3,0.812,1,West,2027,5,2026-11-19,2026-11-21 15:18,Scoring machine | Glass cleaner | Rim protector,"Posts 28.6 PPG on .528 shooting, plus 11.9 RPG and 3.9 BPG, for a 13-3 team."
+giannis_antetokounmpo_mia,3,4,↑4,Giannis Antetokounmpo,MIA,PF,0.876973,15,15,32.1,28.2,12.6,5.5,0.9,1.3,0.602,0.242,0.645,9-6,0.6,4,East,2027,5,2026-11-19,2026-11-21 15:18,Scoring machine | Glass cleaner | Playmaking big,"Averages 28.2 points, 12.6 rebounds and 5.5 assists per game on a .602 field goal clip for a 9-6 team."
+nikola_jokic_den,4,2,↑2,Nikola Jokić,DEN,C,0.843738,13,13,36.7,24.1,10.7,8.9,1.7,1.1,0.517,0.281,0.898,8-5,0.615,7,West,2027,5,2026-11-19,2026-11-21 15:18,,
+cade_cunningham_det,5,0,–,Cade Cunningham,DET,PG,0.797293,13,14,34.8,25.8,5.2,7.8,1.4,0.9,0.477,0.317,0.856,10-4,0.714,3,East,2027,5,2026-11-19,2026-11-21 15:18,,
+alperen_sengun_hou,6,-2,↓2,Alperen Şengün,HOU,C,0.791847,14,16,32.8,21.6,9.2,6.8,1.1,0.9,0.545,0.5,0.744,12-4,0.75,3,West,2027,5,2026-11-19,2026-11-21 15:18,,
+jayson_tatum_bos,7,-4,↓4,Jayson Tatum,BOS,SF,0.788671,14,15,34.1,26.4,6.6,6.8,0.7,0.7,0.428,0.333,0.865,11-4,0.733,2,East,2027,5,2026-11-19,2026-11-21 15:18,,
+tyrese_maxey_phi,8,0,–,Tyrese Maxey,PHI,PG,0.77572,15,16,36.1,26.5,3.3,5.8,1.3,0.5,0.5,0.38,0.867,13-3,0.812,1,East,2027,5,2026-11-19,2026-11-21 15:18,,
+karl_anthony_towns_nyk,9,6,↑6,Karl-Anthony Towns,NYK,C,0.757478,15,15,32.8,21.3,13.9,3.9,0.9,0.6,0.537,0.385,0.775,9-6,0.6,4,East,2027,5,2026-11-19,2026-11-21 15:18,,
+shai_gilgeous_alexander_okc,10,3,↑3,Shai Gilgeous-Alexander,OKC,PG,0.725689,15,15,33.2,31.1,4.1,4.3,0.9,0.9,0.476,0.358,0.835,9-6,0.6,8,West,2027,5,2026-11-19,2026-11-21 15:18,,
+walker_kessler_lal,11,-2,↓2,Walker Kessler,LAL,C,0.723164,15,16,30.9,14.2,10.9,1.8,1.1,2.1,0.667,,0.617,13-3,0.812,1,West,2027,5,2026-11-19,2026-11-21 15:18,,"Trails Towns in scoring, 14.2 PPG to 21.3, despite a 13-3 team record"
+austin_reaves_lal,12,-2,↓2,Austin Reaves,LAL,SG,0.71576,12,16,35.3,24.7,3.3,4.7,1.2,0.3,0.513,0.409,0.915,13-3,0.812,1,West,2027,5,2026-11-19,2026-11-21 15:18,,Played 12 of 16 games; 24.7 PPG trails Gilgeous-Alexander's 31.1
+jamal_murray_den,13,9,↑9,Jamal Murray,DEN,PG,0.715129,13,13,36.5,25.7,5.2,5.7,1.2,1.0,0.507,0.462,0.87,8-5,0.615,7,West,2027,5,2026-11-19,2026-11-21 15:18,,Scores 25.7 PPG to Gilgeous-Alexander's 31.1; shooting .462 from three
+cooper_flagg_dal,14,0,–,Cooper Flagg,DAL,SF,0.705954,14,15,33.4,24.2,6.6,6.4,2.1,0.7,0.485,0.299,0.895,8-7,0.533,9,West,2027,5,2026-11-19,2026-11-21 15:18,,Team 8-7 vs Tatum's 11-4 holds him back despite 24.2 PPG
+jaylen_brown_phi,15,8,↑8,Jaylen Brown,PHI,SF,0.703101,14,16,34.6,22.6,6.6,3.6,1.3,0.5,0.494,0.386,0.705,13-3,0.812,1,East,2027,5,2026-11-19,2026-11-21 15:18,,Missed 2 games; 22.6 PPG trails Tatum's 26.4 in the top 10
+cameron_boozer_mem,16,,NEW,Cameron Boozer,MEM,PF,0.702468,16,16,30.9,16.6,9.2,5.3,0.8,0.8,0.417,0.322,0.896,12-4,0.75,3,West,2027,5,2026-11-19,2026-11-21 15:18,,
+joel_embiid_phi,17,10,↑10,Joel Embiid,PHI,C,0.701609,13,16,31.9,20.0,8.3,3.8,0.8,1.0,0.399,0.146,0.885,13-3,0.812,1,East,2027,5,2026-11-19,2026-11-21 15:18,,
+ty_jerome_mem,18,3,↑3,Ty Jerome,MEM,PG,0.699533,11,16,30.5,25.4,3.4,5.3,0.7,0.2,0.485,0.359,0.902,12-4,0.75,3,West,2027,5,2026-11-19,2026-11-21 15:18,,
+deni_avdija_por,19,-7,↓7,Deni Avdija,POR,SF,0.697433,13,15,32.5,24.2,6.2,6.1,1.1,0.4,0.507,0.386,0.712,10-5,0.667,6,West,2027,5,2026-11-19,2026-11-21 15:18,,
+kevin_durant_hou,20,-3,↓3,Kevin Durant,HOU,SF,0.689921,16,16,33.4,21.3,5.3,3.8,0.5,1.0,0.498,0.406,0.873,12-4,0.75,3,West,2027,5,2026-11-19,2026-11-21 15:18,,
+dylan_harper_sas,21,-5,↓5,Dylan Harper,SAS,SG,0.68308,15,16,31.7,18.4,5.4,4.5,0.9,0.1,0.505,0.315,0.865,13-3,0.812,1,West,2027,5,2026-11-19,2026-11-21 15:18,,
+franz_wagner_orl,22,8,↑8,Franz Wagner,ORL,SF,0.678088,14,14,36.8,24.4,6.9,8.5,1.3,0.3,0.47,0.25,0.841,6-8,0.429,8,East,2027,5,2026-11-19,2026-11-21 15:18,,
+paul_george_bos,23,-12,↓12,Paul George,BOS,PF,0.673205,13,15,29.6,19.9,5.5,3.7,2.1,0.4,0.465,0.423,0.784,11-4,0.733,2,East,2027,5,2026-11-19,2026-11-21 15:18,,
+stephon_castle_sas,24,1,↑1,Stephon Castle,SAS,SG,0.669804,16,16,29.6,15.7,5.3,5.9,1.2,0.3,0.429,0.348,0.786,13-3,0.812,1,West,2027,5,2026-11-19,2026-11-21 15:18,,
+jalen_brunson_nyk,25,,NEW,Jalen Brunson,NYK,PG,0.668935,15,15,34.4,26.6,2.9,5.9,0.8,0.3,0.433,0.4,0.814,9-6,0.6,4,East,2027,5,2026-11-19,2026-11-21 15:18,,
+jalen_johnson_atl,26,2,↑2,Jalen Johnson,ATL,PF,0.663457,12,15,34.3,19.2,9.3,7.6,0.8,0.5,0.432,0.18,0.797,9-6,0.6,4,East,2027,5,2026-11-19,2026-11-21 15:18,,
+lebron_james_phi,27,,NEW,LeBron James,PHI,PF,0.659387,12,16,32.5,15.7,6.8,6.8,1.1,0.7,0.449,0.222,0.731,13-3,0.812,1,East,2027,5,2026-11-19,2026-11-21 15:18,,
+bam_adebayo_mia,28,,NEW,Bam Adebayo,MIA,C,0.649379,15,15,32.3,18.9,7.7,3.1,2.1,0.7,0.524,0.245,0.74,9-6,0.6,4,East,2027,5,2026-11-19,2026-11-21 15:18,,
+cedric_coward_mem,29,,NEW,Cedric Coward,MEM,SG,0.648161,15,16,28.7,14.8,8.1,3.5,1.5,0.4,0.479,0.463,0.813,12-4,0.75,3,West,2027,5,2026-11-19,2026-11-21 15:18,,
+cam_spencer_mem,30,,NEW,Cam Spencer,MEM,SG,0.644243,16,16,22.5,11.3,3.0,5.8,0.8,0.1,0.554,0.559,0.958,12-4,0.75,3,West,2027,5,2026-11-19,2026-11-21 15:18,,
