@@ -1,0 +1,59 @@
+{
+  "sport": "nba",
+  "season": 2027,
+  "through_week": 5,
+  "stats_through": "2026-11-19",
+  "story_type": "top5_climber",
+  "hook": "Up 4 spots into the top 5",
+  "reason": "Giannis Antetokounmpo climbed 4 spots into the top 5",
+  "player": {
+    "player_name": "Giannis Antetokounmpo",
+    "team": "MIA",
+    "position": "PF",
+    "player_key": "giannis_antetokounmpo_mia"
+  },
+  "prev_rank": 7,
+  "cur_rank": 3,
+  "season_ranks": "Week 2: No. 30, Week 3: No. 11, Week 4: No. 7",
+  "stat_chips": [
+    {
+      "label": "PPG",
+      "value": "28.2"
+    },
+    {
+      "label": "RPG",
+      "value": "12.6"
+    },
+    {
+      "label": "BPG",
+      "value": "1.3"
+    },
+    {
+      "label": "FG%",
+      "value": ".602"
+    }
+  ],
+  "captions": [
+    "28.2 points a game",
+    "12.6 rebounds a game",
+    "5.5 assists a game",
+    "FG .602",
+    "Miami is 9-6"
+  ],
+  "instagram_caption": "Giannis Antetokounmpo climbed from No. 7 to No. 3 on our MVP board this week, averaging 28.2 points, 12.6 rebounds and 5.5 assists a game on FG .602 for a 9-6 Miami team. Full board at stingercollectibles.com",
+  "hashtags": [
+    "#StingerNBA",
+    "#GiannisAntetokounmpo",
+    "#NBAMVP",
+    "#MVPRace",
+    "#HEATCulture"
+  ],
+  "script_model": "claude-opus-5-5",
+  "script_words": 73,
+  "warnings": [],
+  "video": "reel_latest.mp4",
+  "duration_s": 27,
+  "release_tag": "reel-latest",
+  "release_asset": "nba_reel_2027_wk05.mp4",
+  "updated_utc": "2026-11-21 17:09"
+}

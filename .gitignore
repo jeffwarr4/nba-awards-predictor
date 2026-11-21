@@ -56,3 +56,7 @@ outputs/web/
 
 # Logs
 *.log
+
+# Weekly reel: the MP4 goes to the reel-latest release, not git; scene frames are a local check
+predictions/*/reel/*.mp4
+predictions/*/reel/frames*/
