@@ -1,15 +1,20 @@
 """
-Narration script for the weekly NBA MVP reel (ported from the NFL and NHL reels), written for Jeff to read aloud (first person, his voice),
-split into the five scene beats of config.REEL_SCENES, plus on-screen caption chunks, an Instagram
+Narration script for the weekly NBA MVP reel, written for Jeff to voice over in Instagram (first person, his
+voice), split into the four scene beats of config.REEL_SCENES, plus the on-screen comment question, an Instagram
 caption and hashtags.
 
-Uses REEL_MODEL (Opus 5.5) rather than the chips' Haiku: one call a week, and the voice matters.
-Skipped with a warning when ANTHROPIC_API_KEY is not set (the reel still renders, without captions).
+Reworked Nov 2026 for retention: the first beat is the surprising fact (no warm-up), there's no filler, and the
+reel ends on one easy comment question instead of a spoken URL (the URL is in the caption and small on screen).
 
-Hard rules, checked in code (one rewrite request, then the ending line is forced):
-  - REEL_WORDS words across the five beats
+Uses REEL_MODEL (Opus 5.5) rather than the chips' Haiku: one call a week, and the voice matters.
+Skipped with a warning when ANTHROPIC_API_KEY is not set (the reel still renders, with a fallback question).
+
+Hard rules, checked in code by problems() (one rewrite request; if the ending still isn't a question, a
+fallback question for the story type is used):
+  - REEL_WORDS words across the four beats; hook <= REEL_HOOK_MAX_WORDS, ask <= REEL_ASK_MAX_WORDS
+  - the last beat ends with "?"; the on-screen question is 10 words or fewer
+  - no filler phrases, no "our model" in the hook, no spoken URL
   - no MVP probability / % / odds / betting language (the board ranks players; it shows no probability)
-  - the last beat ends with CTA_LINE
 """
 
 from __future__ import annotations
@@ -21,12 +26,13 @@ from typing import List, Optional
 
 import pandas as pd
 
-from config import REEL_MODEL, REEL_SCENES, REEL_WORDS
+from config import REEL_ASK_MAX_WORDS, REEL_HOOK_MAX_WORDS, REEL_MODEL, REEL_SCENES, REEL_WORDS
 from src.publish.generate_captions import TEAM_HASHTAGS, name_tag
 from src.publish.reel_story import Story
 from src.publish.stats import STAT_LABELS, format_stat, stat_line
 
-CTA_LINE = "Full board at stingercollectibles.com"
+CTA_LINE = "Full board at stingercollectibles.com"     # ends the Instagram caption; not spoken any more
+QUESTION_MAX_WORDS = 10
 
 # Probability, odds and betting words. Word-bounded so "better" or "between" don't trip it.
 FORBIDDEN = re.compile(
@@ -35,34 +41,48 @@ FORBIDDEN = re.compile(
     re.IGNORECASE,
 )
 
+# Warm-up phrases that cost seconds and don't say anything. Checked in the spoken beats only.
+FILLER = re.compile(
+    r"here'?s what (jumped|stood) out|\bi'?ll be honest\b|\blet'?s\b|\bcheck (it |this )?out\b|\bmake sure to\b"
+    r"|\bstingercollectibles\b|\blink in bio\b|\bfull board\b",
+    re.IGNORECASE,
+)
+
 SCENE_NOTES = {
-    "hook":    "Hook. On screen: the hook text in big type, with the week label.",
-    "player":  "Player. On screen: headshot and team logo; the rank animates from last week's to this week's.",
-    "why":     "Why. On screen: the stat chips listed below build in one at a time, with your caption chunks under them.",
-    "context": "Context. On screen: the top 5 this week, featured player highlighted.",
-    "cta":     "Call to action. On screen: stingercollectibles.com and the Stinger logo.",
+    "hook":    "Hook. On screen from the very first frame: his headshot, the hook text and his rank flipping from last "
+               "week's to this week's. Say the surprising fact, nothing else. No greeting, no \"our model\", no name-drop "
+               "of STINGER.",
+    "proof":   "Proof. On screen: the stat cards listed below punch in one at a time, then his team's record. "
+               "Make the case in numbers, strongest first.",
+    "context": "Context. On screen: the top 5 this week, featured player highlighted. Where he sits and who's ahead.",
+    "ask":     "Ask. On screen: your comment question in big type. One question viewers can answer in a word "
+               "(yes/no, or pick one of two names). Nothing after it.",
 }
 
 APPROVED_TAGS = ("#NBA #NBATwitter #Basketball #NBA{season_tag} #NBASeason "
                  "#NBAMVP #MVPRace #MVPWatch #KiaMVP #NBAAwards #NBAStats #StingerNBA #StingerSports")
 
-SYSTEM_PROMPT = """You write the weekly voiceover script for STINGER's NBA MVP reel: a 25-second vertical video that tells ONE story from our model's NBA MVP board. Jeff, who runs STINGER, records it himself on his phone, reading your script on the first take.
+SYSTEM_PROMPT = """You write the weekly voiceover script for STINGER's NBA MVP reel: a 20-second vertical video that tells ONE story from our model's NBA MVP board. Jeff, who runs STINGER, records it in Instagram over the video on the first take.
 
-Voice: Jeff, in the first person. A data guy talking to a friend about what his model found, not an announcer reading copy. Say "our model", "here's what jumped out to me", "I'll be honest". Short sentences. Plain words that are easy to say out loud. Contractions. No hype words, no puns, no exclamation marks unless one really earns it.
+The first two seconds decide whether anyone keeps watching. Open with the most surprising fact in the input (a rank jump, a big number), in {hook_max} words or fewer. No greeting, no "our model" in the first beat, no warm-up.
 
-Facts: use ONLY the facts in the user message. Never invent a stat, game, injury, streak or standing. Team records are W-L (e.g. 13-3); say them as given, and don't call a record perfect or undefeated unless it has no losses. Stats are per game: say "38.1 points a game", not "38.1 points". Shooting is given as a decimal (FG% .528): say "shooting .528 from the field" or "five-twenty-eight from the field", never "percent", and in captions write "FG .528" or "3PT .383" (no % sign, which reads as a probability). Don't claim standings (conference or division leads, playoff or play-in spots) unless the user message states them; the conference rank, when given, can be said as given ("first in the West"). Write ranks as "No. 4".
+Voice: Jeff, in the first person. A data guy telling a friend what his model found. Short sentences. Plain words that are easy to say out loud. Contractions. Every sentence carries a fact. No filler: never "here's what jumped out", "I'll be honest", "let's", "check out", "make sure to". No hype words, no puns, no exclamation marks.
 
-Make the case with how he's playing: points, rebounds, assists, steals, blocks, shooting, and the team's record. Lead the Why beat with the numbers that make the strongest MVP case (usually scoring, then his best all-around number); you don't have to read every chip, and a modest number (1.3 blocks a game) isn't a selling point. Don't use games played or availability ("he's played every game") as a selling point; it isn't an MVP argument.
+Facts: use ONLY the facts in the user message. Never invent a stat, game, injury, streak or standing. Team records are W-L (e.g. 13-3); say them as given, and don't call a record perfect or undefeated unless it has no losses. Stats are per game: say "38.1 points a game", not "38.1 points". Shooting is given as a decimal (FG% .528): say "shooting .528 from the field" or "five-twenty-eight from the field", never "percent". Don't claim standings (conference or division leads, playoff or play-in spots) unless the user message states them; the conference rank, when given, can be said as given ("first in the West"). Write ranks as "No. 4".
 
-Season context: if the user message gives his rank by week, use it only as given. A "back_to_no1" story means he held No. 1 earlier this season and has taken it back; never call him new to No. 1 or say it's his first time there.
+Make the case with how he's playing: points, rebounds, assists, steals, blocks, shooting, and the team's record. Lead with the numbers that make the strongest MVP case (usually scoring, then his best all-around number); you don't have to read every stat card, and a modest number (1.3 blocks a game) isn't a selling point. Don't use games played or availability as a selling point.
+
+Season context: if the user message gives his rank by week, use it only as given. A "back_to_no1" story means he held No. 1 earlier this season and has taken it back; never call him new to No. 1.
 
 Never show or imply a probability: no %, no "percent", "odds", "chance", "likely", "favorite", "lock", and no betting language at all. The model ranks players; it does not give anyone a percent chance.
 
-Structure: exactly five beats, one per scene, in order, each sized to its time window (about 2.7 words per second; the user message gives a target for each). The whole script is {lo}-{hi} words. The last beat ends with exactly: "{cta}"
+End on ONE comment question that a viewer can answer in a word: yes/no, or pick one of two players named in the input (e.g. "Giannis or Wemby: who finishes higher?"). The last beat is {ask_max} words or fewer and ends with that question mark. Don't mention the website, a link or "full board" anywhere in the beats.
+
+Structure: exactly four beats, one per scene, in order, each sized to its time window (about 2.7 words per second; the user message gives a target for each). The whole script is {lo}-{hi} words.
 
 Also write:
-- captions: 3 to 5 short on-screen text chunks for the Why scene (each 6 words or fewer), facts from the input, in the order you mention them.
-- instagram_caption: 2 sentences, under 280 characters, no hashtags, ranks as "No. 4", ending with "{cta}".
+- question: the comment question as on-screen text, {q_max} words or fewer, ending with "?".
+- instagram_caption: 2 sentences, under 280 characters, no hashtags, ranks as "No. 4". The first sentence repeats the question; the second ends with exactly "{cta}".
 - hashtags: exactly 5, most important first, chosen only from the approved tags and the player/team tags in the user message. Always include #StingerNBA.
 """
 
@@ -78,11 +98,11 @@ SCHEMA = {
                 "additionalProperties": False,
             },
         },
-        "captions": {"type": "array", "items": {"type": "string"}},
+        "question": {"type": "string"},
         "instagram_caption": {"type": "string"},
         "hashtags": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["beats", "captions", "instagram_caption", "hashtags"],
+    "required": ["beats", "question", "instagram_caption", "hashtags"],
     "additionalProperties": False,
 }
 
@@ -102,6 +122,21 @@ def _conf(p: pd.Series) -> str:
 def _player_line(p: pd.Series) -> str:
     return (f"No. {int(p['rank'])} {p['player_name']} ({p['team']} {p['position']}, team record {p['team_record']}, "
             f"{p.get('movement', '')} vs last week): {stat_line(p)}")
+
+
+def spoken_name(p: pd.Series) -> str:
+    """What the fallback question calls him: the first name ("Giannis", "Luka")."""
+    return str(p["player_name"]).split()[0]
+
+
+def fallback_question(story: Story) -> str:
+    """Used when there's no script, or the model's ending still isn't a question after the rewrite."""
+    n = spoken_name(story.player)
+    if story.story_type in ("new_no1", "back_to_no1", "profile_no1"):
+        return f"Is {n} your MVP right now?"
+    if story.story_type == "top5_drop":
+        return f"Is {n} out of the MVP race?"
+    return f"Is {n} a real MVP contender?"
 
 
 def build_message(story: Story, board: pd.DataFrame, chip_stats: List[str], season: int, week: int,
@@ -130,11 +165,14 @@ def build_message(story: Story, board: pd.DataFrame, chip_stats: List[str], seas
     lines += ["", "Scenes (write one beat for each, in order):"]
     for name, start, end in REEL_SCENES:
         note = SCENE_NOTES[name]
-        if name == "why":
-            note += " Chips: " + ", ".join(f"{STAT_LABELS.get(c, c)} {format_stat(c, p.get(c))}" for c in chip_stats)
-        lines.append(f"- {name} {_clock(start)}-{_clock(end)}: about {round((end - start) * 2.7)} words. {note}")
+        if name == "proof":
+            note += " Stat cards: " + ", ".join(f"{STAT_LABELS.get(c, c)} {format_stat(c, p.get(c))}" for c in chip_stats)
+        words = (f"{REEL_HOOK_MAX_WORDS} words or fewer" if name == "hook"
+                 else f"{REEL_ASK_MAX_WORDS} words or fewer" if name == "ask"
+                 else f"about {round((end - start) * 2.7)} words")
+        lines.append(f"- {name} {_clock(start)}-{_clock(end)}: {words}. {note}")
 
-    player_tag = "#" + name_tag(str(p["player_name"]))     # accents transliterated: #LukaDoncic
+    player_tag = "#" + name_tag(str(p["player_name"]))       # accents transliterated: #LukaDoncic
     team_tag = TEAM_HASHTAGS.get(str(p["team"]), "")
     lines += ["", f"Approved tags: {APPROVED_TAGS.format(season_tag=f'{season - 1}{str(season)[-2:]}')}",
               f"Player/team tags: {player_tag} {team_tag}".rstrip()]
@@ -146,22 +184,40 @@ def word_count(data: dict) -> int:
 
 
 def problems(data: dict) -> List[str]:
+    """Everything wrong with a script, as instructions the model can act on. Empty when it's fine."""
     out = []
     names = [s[0] for s in REEL_SCENES]
-    if [b.get("scene") for b in data["beats"]] != names:
+    beats = data.get("beats") or []
+    if [b.get("scene") for b in beats] != names:
         out.append(f"beats must be exactly {names}, in that order")
     n = word_count(data)
     if not REEL_WORDS[0] <= n <= REEL_WORDS[1]:
-        out.append(f"the five beats total {n} words; they must total {REEL_WORDS[0]}-{REEL_WORDS[1]}")
-    texts = [b["text"] for b in data["beats"]] + data["captions"] + [data["instagram_caption"]]
+        out.append(f"the four beats total {n} words; they must total {REEL_WORDS[0]}-{REEL_WORDS[1]}")
+    by_scene = {b.get("scene"): b.get("text", "") for b in beats}
+    hook = by_scene.get("hook", "")
+    if len(hook.split()) > REEL_HOOK_MAX_WORDS:
+        out.append(f"the hook beat is {len(hook.split())} words; keep it to {REEL_HOOK_MAX_WORDS} or fewer")
+    if re.search(r"\bour model\b", hook, re.IGNORECASE):
+        out.append('don\'t say "our model" in the hook beat; open with the fact')
+    if beats:
+        last = beats[-1].get("text", "").rstrip()
+        if not last.endswith("?"):
+            out.append("the last beat must end with the comment question (a question mark)")
+        if len(last.split()) > REEL_ASK_MAX_WORDS:
+            out.append(f"the last beat is {len(last.split())} words; keep it to {REEL_ASK_MAX_WORDS} or fewer")
+    q = data.get("question", "").strip()
+    if not q.endswith("?") or len(q.split()) > QUESTION_MAX_WORDS:
+        out.append(f"question: one question, {QUESTION_MAX_WORDS} words or fewer, ending with \"?\"")
+    filler = sorted({m.group(0).lower() for b in beats for m in FILLER.finditer(b.get("text", ""))})
+    if filler:
+        out.append(f"cut the filler / spoken link: {', '.join(filler)}")
+    texts = [b.get("text", "") for b in beats] + [q, data.get("instagram_caption", "")]
     hits = sorted({m.group(0) for t in texts for m in FORBIDDEN.finditer(t)})
     if hits:
         out.append(f"remove probability/betting language: {', '.join(hits)}")
-    if data["beats"] and not data["beats"][-1]["text"].rstrip().rstrip(".").endswith(CTA_LINE):
-        out.append(f'the last beat must end with "{CTA_LINE}"')
-    if not 3 <= len(data["captions"]) <= 5 or any(len(c.split()) > 6 for c in data["captions"]):
-        out.append("captions: 3 to 5 chunks, each 6 words or fewer")
-    if len(data["hashtags"]) != 5:
+    if not data.get("instagram_caption", "").rstrip().rstrip(".").endswith(CTA_LINE):
+        out.append(f'the Instagram caption must end with "{CTA_LINE}"')
+    if len(data.get("hashtags") or []) != 5:
         out.append("exactly 5 hashtags")
     return out
 
@@ -173,7 +229,8 @@ def _ask(client, message: str) -> dict:
         betas=["server-side-fallback-2026-07-01"],
         fallbacks="default",                      # if Opus declines, the API reruns it on a fallback model
         output_config={"effort": "medium", "format": {"type": "json_schema", "schema": SCHEMA}},
-        system=SYSTEM_PROMPT.format(lo=REEL_WORDS[0], hi=REEL_WORDS[1], cta=CTA_LINE),
+        system=SYSTEM_PROMPT.format(lo=REEL_WORDS[0], hi=REEL_WORDS[1], cta=CTA_LINE, hook_max=REEL_HOOK_MAX_WORDS,
+                                    ask_max=REEL_ASK_MAX_WORDS, q_max=QUESTION_MAX_WORDS),
         messages=[{"role": "user", "content": message}],
     )
     if resp.stop_reason == "refusal":
@@ -184,15 +241,32 @@ def _ask(client, message: str) -> dict:
     return json.loads(text)
 
 
-def _force_ending(data: dict) -> None:
-    last = data["beats"][-1]
-    if not last["text"].rstrip().rstrip(".").endswith(CTA_LINE):
-        last["text"] = f"{last['text'].rstrip()} {CTA_LINE}."
+def finish(data: dict, story: Story) -> dict:
+    """Last-resort fixes after the rewrite, then timings, word count and any remaining warnings."""
+    beats = data["beats"]
+    if beats and not beats[-1]["text"].rstrip().endswith("?"):
+        q = fallback_question(story)
+        beats[-1]["text"] = f"{beats[-1]['text'].rstrip()} {q}".strip()
+        data["question"] = q
+    q = data.get("question", "").strip()
+    if not q.endswith("?") or len(q.split()) > QUESTION_MAX_WORDS:
+        data["question"] = fallback_question(story)
+    cap = data.get("instagram_caption", "").rstrip()
+    if not cap.rstrip(".").endswith(CTA_LINE):
+        data["instagram_caption"] = f"{cap} {CTA_LINE}".strip()
+    data["warnings"] = problems(data)
+    for w in data["warnings"]:
+        print(f"  [WARN] Reel script: {w}")
+    windows = {name: (start, end) for name, start, end in REEL_SCENES}
+    for b in beats:
+        b["start"], b["end"] = windows.get(b["scene"], (None, None))
+    data["words"] = word_count(data)
+    return data
 
 
 def generate_reel_script(story: Story, board: pd.DataFrame, chip_stats: List[str],
                          season: int, week: int, history: str = "") -> Optional[dict]:
-    """{beats: [{scene, start, end, text}], captions, instagram_caption, hashtags, words, warnings}, or None.
+    """{beats: [{scene, start, end, text}], question, instagram_caption, hashtags, words, warnings}, or None.
     history: the featured player's rank on earlier weekly boards (reel_story.rank_history)."""
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("[WARN] ANTHROPIC_API_KEY not set — reel script skipped")
@@ -214,13 +288,4 @@ def generate_reel_script(story: Story, board: pd.DataFrame, chip_stats: List[str
     except (anthropic.APIError, RuntimeError, ValueError, json.JSONDecodeError) as e:
         print(f"  ! Reel script failed: {e}")
         return None
-
-    _force_ending(data)
-    data["warnings"] = problems(data)
-    for w in data["warnings"]:
-        print(f"  [WARN] Reel script: {w}")
-    windows = {name: (start, end) for name, start, end in REEL_SCENES}
-    for b in data["beats"]:
-        b["start"], b["end"] = windows.get(b["scene"], (None, None))
-    data["words"] = word_count(data)
-    return data
+    return finish(data, story)

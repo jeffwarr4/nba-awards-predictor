@@ -4,7 +4,7 @@
   "through_week": 5,
   "stats_through": "2026-11-19",
   "story_type": "top5_climber",
-  "hook": "Up 4 spots into the top 5",
+  "hook": "No. 30 → No. 3 in 3 weeks",
   "reason": "Giannis Antetokounmpo climbed 4 spots into the top 5",
   "player": {
     "player_name": "Giannis Antetokounmpo",
@@ -33,14 +33,9 @@
       "value": ".602"
     }
   ],
-  "captions": [
-    "28.2 points a game",
-    "12.6 rebounds a game",
-    "5.5 assists a game",
-    "FG .602",
-    "Miami is 9-6"
-  ],
-  "instagram_caption": "Giannis Antetokounmpo climbed from No. 7 to No. 3 on our MVP board this week, averaging 28.2 points, 12.6 rebounds and 5.5 assists a game on FG .602 for a 9-6 Miami team. Full board at stingercollectibles.com",
+  "question": "Giannis or Wemby: who finishes higher?",
+  "captions": [],
+  "instagram_caption": "Giannis or Wemby: who finishes higher? Giannis went from No. 30 to No. 3 in three weeks with 28.2 points and 12.6 rebounds a game, so see where everyone stands: Full board at stingercollectibles.com",
   "hashtags": [
     "#StingerNBA",
     "#GiannisAntetokounmpo",
@@ -49,11 +44,11 @@
     "#HEATCulture"
   ],
   "script_model": "claude-opus-5-5",
-  "script_words": 73,
+  "script_words": 50,
   "warnings": [],
   "video": "reel_latest.mp4",
-  "duration_s": 27,
+  "duration_s": 21,
   "release_tag": "reel-latest",
   "release_asset": "nba_reel_2027_wk05.mp4",
-  "updated_utc": "2026-11-21 17:09"
+  "updated_utc": "2026-11-22 06:53"
 }

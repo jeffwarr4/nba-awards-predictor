@@ -109,28 +109,44 @@ season history. Weeks 2–4 of 2026–27 were backfilled from the workflow's com
 
 ## Weekly reel (`src/publish/render_reel.py`, port of the NHL and NFL reels)
 
-One story per week as a silent 1080×1920 MP4 (25 s + 2 s hold) plus a narration script Jeff records over it in
-CapCut; posted the day after the board. `python -m src.publish.render_reel [--outdir DIR] [--frames-only]
-[--no-script] [--story FILE]`; tests: `python -m pytest tests/`.
-- `reel_story.pick_story` (pure) takes the first match: new No. 1 (or "back at No. 1" if he held it on an earlier
+One story per week as a silent 1080×1920 MP4 (20 s + 1 s hold) plus a narration script Jeff voices over in
+Instagram (he adds the Captions sticker there; nothing is burned in); posted the day after the board.
+`python -m src.publish.render_reel [--outdir DIR] [--frames-only] [--no-script] [--story FILE]`; tests:
+`python -m pytest tests/`.
+
+Reworked Nov 2026 for retention. The first reels lost viewers in the hook (NHL: ~6 of 27 s watched), so: four
+scenes, `REEL_SCENES` hook 0–3 / proof 3–11 / context 11–16 / ask 16–20. Frame 0 already shows the hook text,
+headshot, name and last week's rank (no fade-ins), and the rank flips to this week's by 0.8 s. The reel ends on a
+comment question, not a spoken URL (the URL is small on screen and ends the Instagram caption).
+- `reel_story.pick_story` (pure) takes the first match: new No. 1 (or "back on top" if he held it on an earlier
   `board_mvp_wkNN.csv`), biggest climber into the top 5, 11+ into the top 10, biggest drop by a former top-5
   player, else a profile of No. 1. Players are matched by `player_key`, as in `.prev_board_mvp.csv`, so a player
-  traded since last week reads as NEW.
-- `reel_script.py` writes five timed beats in Jeff's first-person voice on `REEL_MODEL` (Opus 5.5; chips stay on
-  Haiku) with the per-game stats, W-L record, conference rank and the player's rank on earlier weekly boards. It
-  checks the word count, the closing line, and that no %/odds language slipped in (so captions write "FG .602", not
-  "FG%"). The player hashtag uses `generate_captions.name_tag` (accents transliterated). Settings are `REEL_*` in
-  `config.py`. Needs anthropic 2.x (`fallbacks`); an old local SDK fails the script call.
-- The background is the board's hardwood tinted dark brown (`PLATE`), and the header band is shown as a
-  gold-bordered badge. The Why scene shows the same four stats as the board card (`player_stats`), in box-score
-  order (PPG first) so they follow the narration.
+  traded since last week reads as NEW. Hooks are short and lead with the number. For a climb, `season_lows`
+  (his worst rank on an earlier weekly board) makes the hook his path when it's bigger than last week's move and
+  at least 2 weeks back: "No. 30 → No. 3 in 3 weeks". The reel fonts have no "→" glyph, so `hook_line_img` draws it.
+- `reel_script.py` writes four timed beats in Jeff's first-person voice on `REEL_MODEL` (Opus 5.5; chips stay on
+  Haiku), plus the on-screen `question`, the Instagram caption and 5 hashtags, from the per-game stats, W-L
+  record, conference rank and the player's rank on earlier weekly boards. `problems()` checks `REEL_WORDS`, the hook
+  (≤ `REEL_HOOK_MAX_WORDS`, no "our model"), that the last beat (≤ `REEL_ASK_MAX_WORDS`) ends with "?", no filler
+  ("here's what jumped out", "I'll be honest", "let's", "check out", a spoken link), no %/odds language (so shooting
+  is "FG .602", never "FG%"), and that the caption ends with "Full board at stingercollectibles.com". One rewrite
+  request; then `finish()` swaps in `fallback_question()` for the story type. Tests: `tests/test_reel_script.py`.
+  The player hashtag uses `generate_captions.name_tag` (accents transliterated). Needs anthropic 2.x
+  (`fallbacks`); an old local SDK fails the script call.
+- The background is the board's hardwood tinted dark brown (`PLATE`), and the header band is a gold-bordered
+  badge (small on the hook, larger on the ask). The Proof scene shows the same four stats as the board card
+  (`player_stats`), in box-score order (PPG first), then the team record and conference rank, then the board's
+  `why_blurb`.
 - Outputs in `predictions/{season}/reel/`: `reel_script.txt` and `reel_meta.json` are committed; `reel_latest.mp4`
   is gitignored and the workflow uploads it to the repo's `reel-latest` release as `nba_reel_{season}_wk{NN}.mp4`.
   stinger-website's social-drafts job emails it with the script. Both workflow steps are `continue-on-error`, after
   the headshot fetch and skipped on a no-games week. `predict_current.py` doesn't render the reel; run it on its own
   locally.
 - One-off reels (a correction, a feature, or a hand-written week): a story file names the player and hook and can
-  set labels, cards and a script; it writes `reel_<name>.*` beside the weekly files. Upload the MP4 by hand.
+  set labels, cards and a script (four beats for `REEL_SCENES`, `question`, caption, hashtags); it writes
+  `reel_<name>.*` beside the weekly files. Upload the MP4 by hand.
+- `reel_meta.json` keeps the keys stinger-website reads (`through_week`, `release_asset`, `release_tag`, `player`,
+  `hook`, `story_type`) and adds `question`; `captions` is now always empty.
 
 ## Output contract (website)
 
