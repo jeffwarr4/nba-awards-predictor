@@ -15,40 +15,41 @@
   "prev_rank": 7,
   "cur_rank": 3,
   "season_ranks": "Week 2: No. 30, Week 3: No. 11, Week 4: No. 7",
+  "compare_week": 2,
   "stat_chips": [
     {
+      "label": "MIA record",
+      "value": "1-4 → 9-6"
+    },
+    {
+      "label": "East rank",
+      "value": "No. 12 → No. 4"
+    },
+    {
       "label": "PPG",
-      "value": "28.2"
+      "value": "27.6 → 28.2"
     },
     {
       "label": "RPG",
-      "value": "12.6"
-    },
-    {
-      "label": "BPG",
-      "value": "1.3"
-    },
-    {
-      "label": "FG%",
-      "value": ".602"
+      "value": "11.2 → 12.6"
     }
   ],
-  "question": "Giannis or Wemby: who finishes higher?",
+  "question": "Giannis or Jokić: who finishes higher?",
   "captions": [],
-  "instagram_caption": "Giannis or Wemby: who finishes higher? Giannis went from No. 30 to No. 3 in three weeks with 28.2 points and 12.6 rebounds a game, so see where everyone stands: Full board at stingercollectibles.com",
+  "instagram_caption": "Giannis or Jokić: who finishes higher? Giannis went from No. 30 to No. 3 in three weeks while Miami went 8-2. Full board at stingercollectibles.com",
   "hashtags": [
     "#StingerNBA",
-    "#GiannisAntetokounmpo",
     "#NBAMVP",
-    "#MVPRace",
-    "#HEATCulture"
+    "#GiannisAntetokounmpo",
+    "#HEATCulture",
+    "#MVPRace"
   ],
   "script_model": "claude-opus-5-5",
-  "script_words": 50,
+  "script_words": 45,
   "warnings": [],
   "video": "reel_latest.mp4",
   "duration_s": 21,
   "release_tag": "reel-latest",
   "release_asset": "nba_reel_2027_wk05.mp4",
-  "updated_utc": "2026-11-22 06:53"
+  "updated_utc": "2026-11-23 02:19"
 }

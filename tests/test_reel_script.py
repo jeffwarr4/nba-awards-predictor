@@ -58,6 +58,12 @@ def test_probability_language():
     assert any("probability" in p for p in problems(script(context="He's the favorite now, with Luka and Wemby ahead of him.")))
 
 
+def test_wordy_proof():
+    wordy = ("His scoring barely moved, about twenty-eight a night. Miami did. They were 1-4 and twelfth in the East. "
+             "They've gone 8-2 since and sit fourth. That's our model reacting to winning.")
+    assert any("proof beat is 31 words" in p for p in problems(script(proof=wordy)))
+
+
 def test_word_range():
     assert any("must total" in p for p in problems(script(proof="Scoring 28.2.")))
 
@@ -72,3 +78,49 @@ def test_finish_adds_fallback_question():
 def test_fallback_questions_by_story():
     assert fallback_question(story("new_no1")) == "Is Giannis your MVP right now?"
     assert fallback_question(story("top5_drop")) == "Is Giannis out of the MVP race?"
+
+
+def _rows():
+    now = pd.Series({"rank": 3, "team": "MIA", "team_record": "9-6", "conf_rank": 4, "conference": "East",
+                     "pts": 28.2, "reb": 12.6, "ast": 5.5, "blk": 1.3, "fg_pct": 0.602})
+    then = pd.Series({"week": 2, "rank": 30, "team": "MIA", "team_record": "1-4", "conf_rank": 12, "conference": "East",
+                      "pts": 27.6, "reb": 11.2, "ast": 4.6, "blk": 0.6, "fg_pct": 0.567})
+    return now, then
+
+
+def test_then_now_lines():
+    from src.publish.reel_script import then_now_lines
+    lines = then_now_lines(*_rows(), 5)
+    assert lines[0].startswith("Then vs now (Week 2, 3 weeks ago")
+    assert "- Team record: 1-4 -> 9-6 (8-2 since then)" in lines
+    assert "- Conference rank: No. 12 -> No. 4 in the East" in lines
+    assert "PPG 27.6 -> 28.2" in lines[-1]
+
+
+def test_then_now_cards_lead_with_the_team():
+    from src.publish.render_reel import then_now_cards
+    cards = then_now_cards(*_rows(), ["pts", "reb", "blk", "fg_pct"])
+    assert cards[:3] == [("MIA record", "1-4 → 9-6"), ("East rank", "No. 12 → No. 4"), ("PPG", "27.6 → 28.2")]
+    assert cards[3][0] == "RPG"            # the model weighs his rebounding gain over the doubled (small) blocks
+
+
+def test_stat_percentages_are_allowed():
+    from src.publish.reel_script import probability_language
+    for t in ("60% from the field", "shooting 38 percent from three", "a 68% completion rate",
+              "completion percentage of 68", "FG% .602", "his K% jumped", "a .915 save percentage"):
+        assert probability_language(t) == [], t
+
+
+def test_win_percent_and_probability_are_not():
+    from src.publish.reel_script import probability_language
+    for t in ("a 60% chance at MVP", "his win percentage is .812", "Miami's win % is up", "70 percent of voters"):
+        assert probability_language(t), t
+
+
+def test_jeffs_week5_rewrite_passes():
+    jeff = script(hook="No. 30 to No. 3 in three weeks.",
+                  proof="His numbers barely moved. Twenty-eight a night, 60% from the field. "
+                        "So what changed? Miami. 1-4 then. 8-2 since. That's our model reacting to winning.",
+                  context="Only Luka and Wemby are ahead of him on our board.",
+                  ask="Giannis or Wemby: who finishes higher?")
+    assert problems(jeff) == []

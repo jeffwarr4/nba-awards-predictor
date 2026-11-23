@@ -32,7 +32,7 @@ from typing import Dict, Optional, Tuple
 
 import pandas as pd
 
-from config import REEL_MIN_CLIMB, REEL_MIN_DROP, REEL_TOP_SPOTS, TOP_N
+from config import REEL_LOOKBACK_WEEKS, REEL_MIN_CLIMB, REEL_MIN_DROP, REEL_TOP_SPOTS, TOP_N
 
 
 @dataclass
@@ -83,11 +83,12 @@ def _story(story_type: str, row: pd.Series, prev: Optional[int], reason: str,
 
 
 def load_history(outdir: Path, before_week: int) -> pd.DataFrame:
-    """week, player_key, player_name, rank from the season's weekly boards (board_mvp_wkNN.csv, written by
-    scripts/snapshot_board.py) for weeks before before_week. Empty when there are none (e.g. a replay folder)."""
+    """Every row of the season's weekly boards (board_mvp_wkNN.csv, written by scripts/snapshot_board.py) for weeks
+    before before_week: week, player_key, player_name, rank and the stats, for the then-vs-now comparison. Empty when
+    there are none (e.g. a replay folder)."""
     frames = []
     for f in sorted(Path(outdir).glob("board_mvp_wk*.csv")):
-        d = pd.read_csv(f, dtype={"player_key": str}, usecols=lambda c: c in ("week", "player_key", "player_name", "rank"))
+        d = pd.read_csv(f, dtype={"player_key": str})
         if len(d) and int(d["week"].iloc[0]) < before_week:
             frames.append(d)
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=["week", "player_key", "player_name", "rank"])
@@ -111,6 +112,21 @@ def season_lows(history: pd.DataFrame, week: int) -> Dict[str, Tuple[int, int]]:
     h = history.assign(player_key=history["player_key"].astype(str)).sort_values(["rank", "week"])
     worst = h.groupby("player_key").tail(1)
     return {k: (int(r), int(week) - int(w)) for k, r, w in zip(worst["player_key"], worst["rank"], worst["week"])}
+
+
+def comparison_row(history: pd.DataFrame, player_key: str, week: int, lookback: int = REEL_LOOKBACK_WEEKS,
+                   prefer_week: Optional[int] = None) -> Optional[pd.Series]:
+    """His row on an earlier weekly board to compare with this week ("then vs now"), or None.
+    prefer_week (the week of a path hook, "No. 30 → No. 3 in 3 weeks") wins when he's on that board; otherwise
+    the earliest board he's on within `lookback` weeks. The comparison explains the move: what changed, his
+    numbers or his team's."""
+    if history.empty:
+        return None
+    mine = history[history["player_key"].astype(str) == str(player_key)]
+    if prefer_week is not None and (mine["week"] == prefer_week).any():
+        return mine[mine["week"] == prefer_week].iloc[0]
+    recent = mine[mine["week"] >= week - lookback].sort_values("week")
+    return None if recent.empty else recent.iloc[0]
 
 
 def pick_story(board: pd.DataFrame, prev_ranks: Dict[str, int], past_no1: frozenset = frozenset(),

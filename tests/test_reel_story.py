@@ -118,3 +118,16 @@ def test_season_lows():
     h = pd.DataFrame({"week": [2, 3, 4, 2, 3], "player_key": ["a", "a", "a", "b", "b"], "rank": [30, 11, 7, 5, 5]})
     assert season_lows(h, 5) == {"a": (30, 3), "b": (5, 2)}      # a tie keeps the latest week
     assert season_lows(pd.DataFrame(columns=["week", "player_key", "rank"]), 5) == {}
+
+
+# ── Then vs now (the comparison board that explains the move) ──
+def test_comparison_row():
+    from src.publish.reel_story import comparison_row
+    h = pd.DataFrame({"week": [1, 2, 3, 4, 2, 4], "player_key": ["a", "a", "a", "a", "b", "b"],
+                      "rank": [40, 30, 11, 7, 9, 8]})
+    assert int(comparison_row(h, "a", 5)["week"]) == 2                       # earliest within 3 weeks back
+    assert int(comparison_row(h, "a", 5, prefer_week=1)["week"]) == 1         # the path hook's week wins
+    assert int(comparison_row(h, "a", 5, prefer_week=9)["week"]) == 2         # ...if he's on that board
+    assert int(comparison_row(h, "b", 5)["week"]) == 2
+    assert comparison_row(h, "c", 5) is None
+    assert comparison_row(pd.DataFrame(columns=["week", "player_key", "rank"]), "a", 5) is None
