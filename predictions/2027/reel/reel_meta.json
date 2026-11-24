@@ -4,7 +4,7 @@
   "through_week": 5,
   "stats_through": "2026-11-19",
   "story_type": "top5_climber",
-  "hook": "Up 4 spots into the top 5",
+  "hook": "No. 30 → No. 3 in 3 weeks",
   "reason": "Giannis Antetokounmpo climbed 4 spots into the top 5",
   "player": {
     "player_name": "Giannis Antetokounmpo",
@@ -15,45 +15,41 @@
   "prev_rank": 7,
   "cur_rank": 3,
   "season_ranks": "Week 2: No. 30, Week 3: No. 11, Week 4: No. 7",
+  "compare_week": 2,
   "stat_chips": [
     {
+      "label": "MIA record",
+      "value": "1-4 → 9-6"
+    },
+    {
+      "label": "East rank",
+      "value": "No. 12 → No. 4"
+    },
+    {
       "label": "PPG",
-      "value": "28.2"
+      "value": "27.6 → 28.2"
     },
     {
       "label": "RPG",
-      "value": "12.6"
-    },
-    {
-      "label": "BPG",
-      "value": "1.3"
-    },
-    {
-      "label": "FG%",
-      "value": ".602"
+      "value": "11.2 → 12.6"
     }
   ],
-  "captions": [
-    "28.2 points a game",
-    "12.6 rebounds a game",
-    "5.5 assists a game",
-    "FG .602",
-    "Miami is 9-6"
-  ],
-  "instagram_caption": "Giannis Antetokounmpo climbed from No. 7 to No. 3 on our MVP board this week, averaging 28.2 points, 12.6 rebounds and 5.5 assists a game on FG .602 for a 9-6 Miami team. Full board at stingercollectibles.com",
+  "question": "Giannis or Jokić: who finishes higher?",
+  "captions": [],
+  "instagram_caption": "Giannis or Jokić: who finishes higher? Giannis went from No. 30 to No. 3 in three weeks while Miami went 8-2. Full board at stingercollectibles.com",
   "hashtags": [
     "#StingerNBA",
-    "#GiannisAntetokounmpo",
     "#NBAMVP",
-    "#MVPRace",
-    "#HEATCulture"
+    "#GiannisAntetokounmpo",
+    "#HEATCulture",
+    "#MVPRace"
   ],
   "script_model": "claude-opus-5-5",
-  "script_words": 73,
+  "script_words": 45,
   "warnings": [],
   "video": "reel_latest.mp4",
-  "duration_s": 27,
+  "duration_s": 21,
   "release_tag": "reel-latest",
   "release_asset": "nba_reel_2027_wk05.mp4",
-  "updated_utc": "2026-11-21 17:09"
+  "updated_utc": "2026-11-23 02:19"
 }
