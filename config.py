@@ -63,13 +63,23 @@ REEL_SAFE_TOP    = 250     # px kept clear of the platform UI (top bar)
 REEL_SAFE_BOTTOM = 400     # px kept clear at the bottom (caption, buttons)
 REEL_SAFE_LEFT   = 60
 REEL_SAFE_RIGHT  = 120     # Instagram's like/comment/share column
-REEL_WORDS     = (36, 54)  # narration length across all four beats
+REEL_WORDS     = (40, 50)  # narration length across all four beats
 REEL_PROOF_MAX_WORDS = 26  # the proof beat: short sentences, one fact each (a 31-word proof read as wordy)
 REEL_WPS       = 3.0       # speaking pace for each beat's word target
-REEL_HOOK_MAX_WORDS = 8    # the first beat: the surprising fact, nothing else
+REEL_HOOK_MAX_WORDS = 10   # the first beat: his name, then the hook fact ("Dak Prescott: No. 17 to No. 10 in three weeks.")
 REEL_ASK_MAX_WORDS  = 14   # the last beat: one comment question
 REEL_TOP_SPOTS = 5         # "top 5" for the climber and drop stories
 REEL_MIN_CLIMB = 2         # spots gained to count as a top-5 climber
 REEL_MIN_DROP  = 3         # spots lost by a former top-5 player to count as a drop
 REEL_LOOKBACK_WEEKS = 3    # the "then" in then-vs-now: up to this many weeks back (or the path hook's week)
+# What drove the move, told to the script (reel_script.story_frame): a key per-game stat that moved at least its
+# REEL_FLAT_STATS amount (absolute, per game) with his rank makes it his own production ("his numbers moved");
+# otherwise a team win rate in the window at least REEL_TEAM_SWING above (or below) its rate before the window, over
+# 3+ team games, makes it the team. Absolute, not relative: assists 4.6 -> 5.5 is +20% but nobody would call it a
+# change (2027 Week 5: Giannis's 30 -> 3 was Miami going 8-2, not his passing).
+REEL_FLAT_STATS = {"pts": 2.0, "reb": 1.5, "ast": 1.5}
+REEL_TEAM_SWING = 0.25
+# Players fans know by a short name: saying it counts as saying the full name (accents don't matter).
+REEL_NICKNAMES = {"Giannis Antetokounmpo": "Giannis", "Victor Wembanyama": "Wemby",
+                  "Shai Gilgeous-Alexander": "SGA", "Luka Doncic": "Luka"}
 ARCHIVES_TO_KEEP = 4

@@ -125,16 +125,32 @@ comment question, not a spoken URL (the URL is small on screen and ends the Inst
   (his worst rank on an earlier weekly board) makes the hook his path when it's bigger than last week's move and
   at least 2 weeks back: "No. 30 → No. 3 in 3 weeks". The reel fonts have no "→" glyph, so `hook_line_img` draws it.
 - `reel_script.py` writes four timed beats in Jeff's first-person voice on `REEL_MODEL` (Opus 5.5; chips stay on
-  Haiku), plus the on-screen `question`, the Instagram caption and 5 hashtags, from the per-game stats, W-L
-  record, conference rank and the player's rank on earlier weekly boards. `problems()` checks `REEL_WORDS`, the hook
-  (≤ `REEL_HOOK_MAX_WORDS`, no "our model"), that the last beat (≤ `REEL_ASK_MAX_WORDS`) ends with "?", no filler
-  ("here's what jumped out", "I'll be honest", "let's", "check out", a spoken link), no probability language, and
-  that the caption ends with "Full board at stingercollectibles.com". Percentages: a shooting, completion, K% or
-  save stat is fine ("60% from the field"; `STAT_PCT` removes those before the check); a win % never is (say the
-  record), nor any other percent (`probability_language`). The prompt carries Jeff's own rewrite of Week 5 as the
-  style example: rounded numbers the way fans say them, his numbers in one quick line, then "So what changed?
-  Miami." and "That's our model reacting to winning." One rewrite
-  request; then `finish()` swaps in `fallback_question()` for the story type. Tests: `tests/test_reel_script.py`.
+  Haiku), plus the on-screen `question`, the Instagram caption and 5 hashtags. v3 (Nov 2026) makes it flow: the hook
+  names him ("Giannis: No. 30 to No. 3 in three weeks."), the whole script uses ONE time window, the proof gives ONE
+  reason after a lead-in that rotates by week (`PROOF_OPENERS`: "So what changed?", "Here's why.", "The reason?", "What happened?", offset per sport by `OPENER_OFFSET` so the three sports differ; the model may skip it when the hook makes the reason obvious, and `problems()` flags any other lead-in) in connected sentences (at most two numbers), the context is the gap to the
+  milestone, and the ask is a yes/no or two-way question about it. `story_frame()` hands the script:
+  - the window: the `comparison_row` week to now ("the last three weeks (Week 2 to Week 5), his last ten games"),
+    or "this week" with no earlier board; the hook's ranks are the window's
+  - the driver: `player` if a `REEL_FLAT_STATS` stat (pts/reb/ast, absolute per game) moved by at least its amount
+    with his rank, else `team` if the team's win rate in the window is `REEL_TEAM_SWING` above/below its rate before
+    (3+ games), else `board` if he played no games in the window and players ahead of him dropped, else `unclear`;
+    the script may only claim a cause the driver states
+  - `crossed()`: the players ahead of him at the window's start who are behind him now (or, for a drop, the
+    reverse), from the window-start board
+  - the milestone (`milestone()`): hold No. 1; catch No. 1 from No. 2-3; the top 3 from 4-5; the top 5 from 6-10;
+    the top 10 from 11+
+  `problems()` checks `REEL_WORDS` (40-50), the hook (≤ `REEL_HOOK_MAX_WORDS`, names him, no "our model"), the
+  proof (≤ `REEL_PROOF_MAX_WORDS`), his full name or `REEL_NICKNAMES` short name somewhere (accents folded), no
+  then/since/now without a time anchor in the same sentence (`unanchored_time`: "this week", "Week 8", "three weeks
+  ago", "his last three games"...), a context that doesn't repeat the hook's ranks or name the No. 1 (unless it's a
+  No. 1 story or he's No. 2-3), the last beat ending with "?", no stock phrases or "my model", no probability
+  language, and 5 hashtags. The caption's site line is added in code (`caption_with_cta`): whatever site line the model wrote is cut off and "Full board at stingercollectibles.com." follows as its own sentence. Percentages: a shooting, completion, K% or save stat is fine ("60%
+  from the field"; `STAT_PCT`); a win % never is, nor any other percent (`probability_language`). The prompt carries
+  two style examples (Jeff's, edited to pass the checks). One rewrite request; then `finish()` swaps in
+  `fallback_question()` about the milestone ("Can SGA crack the top 5?"). The result, `reel_meta.json` and the
+  script file keep the frame, `first_draft_problems` and `rewritten`. `render_reel --script-only` writes just the
+  script and meta (for reviewing scripts on replays); a `--story` file without its own cards now gets the
+  then-vs-now comparison too. Tests: `tests/test_reel_script.py`.
   The player hashtag uses `generate_captions.name_tag` (accents transliterated). Needs anthropic 2.x
   (`fallbacks`); an old local SDK fails the script call.
 - **Explain, don't recite.** The script and the Proof cards compare the player then vs now, so the reel says

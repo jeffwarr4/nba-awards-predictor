@@ -34,22 +34,37 @@
       "value": "11.2 → 12.6"
     }
   ],
-  "question": "Giannis or Jokić: who finishes higher?",
+  "question": "Can Giannis catch Luka for No. 1?",
+  "script_frame": {
+    "window": "the last three weeks (Week 2 to Week 5), his last ten games",
+    "start_rank": 30,
+    "driver": "team",
+    "opener": "Here's why.",
+    "crossed": [
+      "Tyrese Haliburton",
+      "Jabari Smith Jr.",
+      "RJ Barrett"
+    ],
+    "milestone": "No. 1",
+    "milestone_player": "Luka Dončić"
+  },
+  "first_draft_problems": [],
+  "rewritten": false,
   "captions": [],
-  "instagram_caption": "Giannis or Jokić: who finishes higher? Giannis went from No. 30 to No. 3 in three weeks while Miami went 8-2. Full board at stingercollectibles.com",
+  "instagram_caption": "Can Giannis catch Luka for No. 1? Giannis Antetokounmpo went from No. 30 to No. 3 on our NBA MVP board in three weeks. Full board at stingercollectibles.com.",
   "hashtags": [
     "#StingerNBA",
     "#NBAMVP",
     "#GiannisAntetokounmpo",
-    "#HEATCulture",
-    "#MVPRace"
+    "#MVPRace",
+    "#HEATCulture"
   ],
   "script_model": "claude-opus-5-5",
-  "script_words": 45,
+  "script_words": 48,
   "warnings": [],
   "video": "reel_latest.mp4",
   "duration_s": 21,
   "release_tag": "reel-latest",
   "release_asset": "nba_reel_2027_wk05.mp4",
-  "updated_utc": "2026-11-23 02:19"
+  "updated_utc": "2026-11-24 22:56"
 }
