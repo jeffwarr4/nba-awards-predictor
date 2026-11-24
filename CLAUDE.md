@@ -110,7 +110,7 @@ season history. Weeks 2–4 of 2026–27 were backfilled from the workflow's com
 ## Weekly reel (`src/publish/render_reel.py`, port of the NHL and NFL reels)
 
 One story per week as a silent 1080×1920 MP4 (20 s + 1 s hold) plus a narration script Jeff voices over in
-Instagram (he adds the Captions sticker there; nothing is burned in); posted the day after the board.
+Instagram (he adds the Captions sticker there; nothing is burned in). The reel posts first, the afternoon the board completes; the static board posts the next day (order reversed 2026-11-24).
 `python -m src.publish.render_reel [--outdir DIR] [--frames-only] [--no-script] [--story FILE]`; tests:
 `python -m pytest tests/`.
 
