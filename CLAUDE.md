@@ -115,7 +115,7 @@ Instagram (he adds the Captions sticker there; nothing is burned in). The reel p
 `python -m pytest tests/`.
 
 Reworked Nov 2026 for retention. The first reels lost viewers in the hook (NHL: ~6 of 27 s watched), so: four
-scenes, `REEL_SCENES` hook 0–3 / proof 3–13 / context 13–16 / ask 16–20, 48–62 words at `REEL_WPS` (3) words a second. Frame 0 already shows the hook text,
+scenes, `REEL_SCENES` hook 0–3 / proof 3–13 / context 13–16 / ask 16–20, 40–50 words (`REEL_WORDS`) at `REEL_WPS` (3) words a second. Frame 0 already shows the hook text,
 headshot, name and last week's rank (no fade-ins), and the rank flips to this week's by 0.8 s. The reel ends on a
 comment question, not a spoken URL (the URL is small on screen and ends the Instagram caption).
 - `reel_story.pick_story` (pure) takes the first match: new No. 1 (or "back on top" if he held it on an earlier
@@ -126,7 +126,7 @@ comment question, not a spoken URL (the URL is small on screen and ends the Inst
   at least 2 weeks back: "No. 30 → No. 3 in 3 weeks". The reel fonts have no "→" glyph, so `hook_line_img` draws it.
 - `reel_script.py` writes four timed beats in Jeff's first-person voice on `REEL_MODEL` (Opus 5.5; chips stay on
   Haiku), plus the on-screen `question`, the Instagram caption and 5 hashtags. v3 (Nov 2026) makes it flow: the hook
-  names him ("Giannis: No. 30 to No. 3 in three weeks."), the whole script uses ONE time window, the proof gives ONE
+  names him in one natural sentence ("Giannis jumped from 30 to 3 in three weeks."), the whole script uses ONE time window, the proof gives ONE
   reason after a lead-in that rotates by week (`PROOF_OPENERS`: "So what changed?", "Here's why.", "The reason?", "What happened?", offset per sport by `OPENER_OFFSET` so the three sports differ; the model may skip it when the hook makes the reason obvious, and `problems()` flags any other lead-in) in connected sentences (at most two numbers), the context is the gap to the
   milestone, and the ask is a yes/no or two-way question about it. `story_frame()` hands the script:
   - the window: the `comparison_row` week to now ("the last three weeks (Week 2 to Week 5), his last ten games"),
@@ -190,7 +190,7 @@ stats_through, updated_utc, chips, why_blurb`
 `rank_delta`: positive = up, blank = NEW. `movement`: `↑2` / `↓2` / `–` / `NEW`. `team_record` is `W-L`.
 Percentages are fractions (`.512`). `team` is an NBA code (`OKC`, `GSW`, `NYK`).
 
-**Legacy feed, until the site switches.** The /nba page reads a Google Sheet that IMPORTDATAs
+**Legacy feed** (the old Squarespace site was replaced by the Cloudflare site on 2026-11-23, which doesn't read it; keep it until Squarespace is cancelled (early Dec 2026, the rollback window), then it can be retired). The old Squarespace /nba page read a Google Sheet that IMPORTDATAs
 `https://jeffwarr4.github.io/nba-awards-predictor/nba/mvp/`: `web_current_top10.csv`, `web_prior_top10.csv`,
 `web_meta.csv`, `model_all_candidates.csv`, `canva_top5_flat.csv`, `canva_6_10_flat.csv`. `predict_current.write_legacy`
 keeps their exact columns (`LEGACY_TOP10_COLS`, `LEGACY_ALL_COLS`) and the old `first_last` key with hyphens dropped
