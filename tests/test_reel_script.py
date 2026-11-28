@@ -28,7 +28,7 @@ def story(kind="top5_climber", name="Giannis Antetokounmpo", prev=7, cur=None):
 # Example 1 from the prompt (a team-driven climb), as edited to pass the checks
 GOOD = {
     "beats": [
-        {"scene": "hook", "text": "Giannis: No. 30 to No. 3 in three weeks."},
+        {"scene": "hook", "text": "Giannis jumped from 30 to 3 in three weeks."},
         {"scene": "proof", "text": "His numbers barely moved: twenty-eight points and nearly thirteen boards a night. "
                                    "The reason? Miami, 1-4 three weeks ago, has gone 8-2 since."},
         {"scene": "context", "text": "Only Luka and Wemby are ahead of him on our board."},
@@ -59,7 +59,7 @@ def test_example_1_passes():
 def test_example_2_passes():
     # Example 2 (NFL) on an NBA-shaped board: a No. 10 player, milestone the top 5
     ex2 = {"beats": [
-        {"scene": "hook", "text": "Shai Gilgeous-Alexander: No. 17 to No. 10 in three weeks."},
+        {"scene": "hook", "text": "Shai Gilgeous-Alexander jumped from 17 to 10 in three weeks."},
         {"scene": "proof", "text": "Here's why. His last three games: twelve touchdowns, two wins, and his "
                                    "season rating up from 93 to 101."},
         {"scene": "context", "text": "Five spots from our top five, and Cunningham is the one to catch."},
@@ -85,18 +85,18 @@ def test_this_weeks_nfl_script_fails_the_new_checks():
 
 
 def test_nickname_counts_as_the_full_name():
-    assert check(script(hook="Giannis: No. 30 to No. 3 in three weeks.")) == []
+    assert check(script(hook="Giannis jumped from 30 to 3 in three weeks.")) == []
     p = check(script(hook="No. 30 to No. 3 in three weeks."))
     assert any("hook must name him" in x for x in p)
 
 
 def test_full_name_needed_without_a_nickname():
     s = story("top5_climber", "Nikola Jokić", prev=9)
-    d = script(hook="Jokić: No. 9 to No. 4 in three weeks.", ask="Jokić or Wemby: who finishes higher?",
+    d = script(hook="Jokić jumped from 9 to 4 in three weeks.", ask="Jokić or Wemby: who finishes higher?",
                context="Only three players sit ahead of him on our board.")
     d["question"] = d["beats"][-1]["text"]
     assert any("full name" in x for x in check(d, s, {9, 4}))
-    d["beats"][0]["text"] = "Nikola Jokic: No. 9 to No. 4 in three weeks."     # accents don't matter
+    d["beats"][0]["text"] = "Nikola Jokic jumped from 9 to 4 in three weeks."     # accents don't matter
     assert check(d, s, {9, 4}) == []
 
 
@@ -112,7 +112,7 @@ def test_context_rank_and_leader():
     p = check(script(context="He's No. 3 behind Luka and Wemby."))
     assert any("repeats the hook's rank (No. 3)" in x for x in p)
     s = story("bubble_breakthrough", "Shai Gilgeous-Alexander", prev=17)          # No. 10: leader not allowed
-    d = script(hook="SGA: No. 17 to No. 10 in three weeks.", context="Luka leads, and SGA is five spots out.",
+    d = script(hook="SGA jumped from 17 to 10 in three weeks.", context="Luka leads, and SGA is five spots out.",
                ask="Can SGA crack the top 5?")
     d["question"] = "Can SGA crack the top 5?"
     assert any("board leader (Luka Dončić)" in x for x in check(d, s, {17, 10}))
@@ -293,3 +293,12 @@ def test_finish_rewrites_the_caption_ending():
     assert out["instagram_caption"] == ("Giannis or Wemby: who finishes higher? He's up 27 spots. "
                                         "Full board at stingercollectibles.com.")
     assert out["warnings"] == []
+
+
+ROBOT, NATURAL = 'Giannis: No. 30 to No. 3 in three weeks.', 'Giannis jumped from 30 to 3 in three weeks.'
+
+
+def test_hook_reads_naturally():
+    p = " || ".join(check(script(hook=ROBOT)))
+    assert "the way a fan would" in p
+    assert not any("the way a fan would" in x for x in check(script(hook=NATURAL)))
